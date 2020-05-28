@@ -6,7 +6,7 @@ const Footer = (props) =>  {
             <strong>Copyright © 2020 <a href="https://oldencars.com">OldenCars Ltd</a>. </strong>
             All rights reserved.
             <div className="float-right d-none d-sm-inline-block">
-                <b>Version</b> 0.1.0
+                <b>Version</b> 0.2.0
             </div>
         </footer>
     )

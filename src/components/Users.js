@@ -58,7 +58,7 @@ const columns = [
         button: true,
     },
 ];
-  
+
 const Users = (props) => {
     function filterUser(user) {
         return (user.attributes.email.toLowerCase().includes(props.filterText) ||
@@ -66,6 +66,14 @@ const Users = (props) => {
                 user.attributes.profile.lastName.toLowerCase().includes(props.filterText));
     }
 
+    /*
+    useEffect(() => {
+        if(props.users.length < 1) {
+            props.actions.loadUsers()
+        }
+    } )
+    */
+    
     return (
         <div className="animated fadeIn">
             <DataTable

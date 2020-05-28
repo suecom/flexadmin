@@ -6,10 +6,10 @@ const integrationSdk = flexIntegrationSdk.createInstance({
     baseUrl: process.env.FLEX_INTEGRATION_BASE_URL || 'https://flex-api.sharetribe.com',
 });
 
-class UserApi {
+class ListingApi {
     getPage(page) {
-        return integrationSdk.users.query({ 
-            'include': 'profileImage,stripeAccount',
+        return integrationSdk.listings.query({ 
+            'include': 'author,images',
             page: page
         }).then(response => {
             return response;
@@ -18,11 +18,11 @@ class UserApi {
         });
     }
 
-    getUsers() {
+    getListings() {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
-                var promises = [], users  = res.data.data;
+                var promises = [], listings  = res.data.data;
 
                 // Start any required requests
                 while(page < res.data.meta.totalPages) {
@@ -31,18 +31,11 @@ class UserApi {
 
                 // Wait for them to complete and add the results
                 const values = await Promise.all(promises);
-                values.map(res => users = users.concat(res.data.data))
+                values.map(res => listings = listings.concat(res.data.data))
 
-                return users;
+                return listings;
             })
-        /*
-        return fetch('http://localhost:8081/api/users').then(response => {
-            return response.json();
-        }).catch(error => {
-            return error;
-        });
-        */
     }
 }
 
-export default UserApi;
+export default ListingApi;

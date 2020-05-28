@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 
 import configureStore from './store/configureStore';
 import { loadUsers } from './actions/userActions';
+import { loadListings } from './actions/listingActions';
 
 import Header from './components/Header';
 import SideBar from './components/SideBar';
@@ -12,7 +13,10 @@ import Footer from './components/Footer';
 
 // Initialize and load store
 const store = configureStore();
+
+// Load it all
 store.dispatch(loadUsers());
+store.dispatch(loadListings());
 
 const App = (props) => {
   const [ filter, setFilter ] = useState('');
