@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import DataTable from 'react-data-table-component';
-import * as flexIntegrationSdk from 'sharetribe-flex-integration-sdk';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
-import axios from 'axios';
-
-const integrationSdk = flexIntegrationSdk.createInstance({
-    clientId: '58a55f71-7650-423f-bbd3-b4f5e61927b7', //process.env.FLEX_INTEGRATION_CLIENT_ID,
-    clientSecret: '14cd97d21409e22c720e58fbf872a2113fb7d1e2', //process.env.FLEX_INTEGRATION_CLIENT_SECRET,
-    baseUrl: process.env.FLEX_INTEGRATION_BASE_URL || 'https://flex-api.sharetribe.com',
-});
-
+import * as actions from '../actions/userActions'
 
 const columns = [
     {
@@ -66,39 +60,18 @@ const columns = [
 ];
   
 const Users = (props) => {
-    const [ data, setData ] = useState([]);
-
     function filterUser(user) {
         return (user.attributes.email.toLowerCase().includes(props.filterText) ||
                 user.attributes.profile.firstName.toLowerCase().includes(props.filterText) ||
                 user.attributes.profile.lastName.toLowerCase().includes(props.filterText));
     }
 
-    function loadFromServer(url) {
-        integrationSdk.users.query({ 
-                    'include': 'profileImage,stripeAccount',
-                    expand: true
-                }).then(res => {
-            setData(res.data.data)
-        })
-        /*
-        axios.get(url + 'users')s
-            .then(res => {
-                setData(res.data);
-            })
-        */
-    }
-
-    useEffect(() => {
-        loadFromServer(props.url);
-    }, [props.url], )
-
     return (
         <div className="animated fadeIn">
             <DataTable
                 title = 'Users'
                 columns = { columns }
-                data = { data.filter(item => filterUser(item)) }
+                data = { props.users.filter(user => filterUser(user)) }
                 keyField = 'id.uuid'
                 dense
                 fixedHeader
@@ -109,4 +82,20 @@ const Users = (props) => {
     )
 }
 
-export default Users;
+function mapStateToProps(state, ownProps) {
+    if (state.users.length > 0) {
+        return {
+            users: state.users
+        };
+    } else {
+        return {
+            users: []
+        }
+    }
+}
+  
+function mapDispatchToProps(dispatch) {
+    return { actions: bindActionCreators(actions, dispatch) }
+}
+  
+export default connect(mapStateToProps, mapDispatchToProps)(Users);

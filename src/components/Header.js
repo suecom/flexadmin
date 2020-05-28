@@ -10,10 +10,10 @@ const Header = (props) => {
             {/* Left navbar links */}
             <ul className="navbar-nav">
                 <li className="nav-item">
-                    <a className="nav-link" data-widget="pushmenu" href="#" role="button"><i className="fas fa-bars" /></a>
+                    <button className="btn" data-widget="pushmenu"><i className="fas fa-bars" /></button>
                 </li>
             </ul>
-            {/* SEARCH FORM */}
+            {/* Search */}
             <div className="input-group input-group-sm">
                 <input className="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search" onChange={onChange} />
                 <div className="input-group-append">

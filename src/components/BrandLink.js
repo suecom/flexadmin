@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
+import React  from 'react';
 import { SizeMe } from 'react-sizeme'
 
 const BrandLink = (props) => {
-    const [ bounds, setBounds ] = useState(null)
     return (
         <SizeMe
             render={({ size }) => {
                 if(size.width > 100) {
                     return (
-                        <a href="index3.html" className="brand-link">
-                            <img src="logo.png" className="brand-image" width={size.width-20} />
-                        </a>
+                        <div className="brand-link">
+                            <img src="logo.png" alt="logo" className="brand-image" width={size.width-20} />
+                        </div>
                     )
                 }
                 else {
                     return (
-                        <a href="index3.html" className="brand-link">
-                            <img src="logo.svg" className="brand-image"  />
-                        </a>
+                        <div className="brand-link">
+                            <img src="logo.svg" alt="logo" className="brand-image"  />
+                        </div>
                     )
                 }
             }}
