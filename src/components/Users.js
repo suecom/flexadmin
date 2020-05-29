@@ -1,9 +1,6 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import DataTable from 'react-data-table-component';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
-import * as actions from '../actions/userActions'
 
 const columns = [
     {
@@ -35,7 +32,7 @@ const columns = [
     },
     {
         name: 'Rented',
-        selector: 'rented',
+        selector: 'rentals',
         sortable: true,
         width: '70px',
         compact: true,
@@ -59,27 +56,34 @@ const columns = [
     },
 ];
 
-const Users = (props) => {
-    function filterUser(user) {
-        return (user.attributes.email.toLowerCase().includes(props.filterText) ||
-                user.attributes.profile.firstName.toLowerCase().includes(props.filterText) ||
-                user.attributes.profile.lastName.toLowerCase().includes(props.filterText));
-    }
-
-    /*
-    useEffect(() => {
-        if(props.users.length < 1) {
-            props.actions.loadUsers()
-        }
-    } )
-    */
+const Users = ({ filterText }) => {
+    const users = useSelector(state => state.users);
+    const listings = useSelector(state => state.listings);
+    const transactions = useSelector(state => state.transactions);
+    const reviews = useSelector(state => state.reviews);
+    const CompletedTransitions = ['transition/review-2-by-customer','transition/review-2-by-provider','transition/complete','transition/review-1-by-provider','transition/review-1-by-customer','transition/expire-customer-review-period','transition/expire-review-period'];
     
+    function filterUser(user) {
+        return (user.attributes.email.toLowerCase().includes(filterText) ||
+                user.attributes.profile.firstName.toLowerCase().includes(filterText) ||
+                user.attributes.profile.lastName.toLowerCase().includes(filterText));
+    }
+    
+    users.forEach(user => {
+        user.listings = listings.filter(listing => listing.relationships.author.data.id.uuid === user.id.uuid).length;
+        user.clients = transactions.filter(transaction => transaction.relationships.provider.data.id.uuid === user.id.uuid &&
+                                                            CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
+        user.rentals = transactions.filter(transaction => transaction.relationships.customer.data.id.uuid === user.id.uuid &&
+                                                            CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
+        user.reviews = reviews.filter(review => review.relationships.subject.data.id.uuid === user.id.uuid).length;
+    })
+
     return (
         <div className="animated fadeIn">
             <DataTable
                 title = 'Users'
                 columns = { columns }
-                data = { props.users.filter(user => filterUser(user)) }
+                data = { users.filter(user => filterUser(user)) }
                 keyField = 'id.uuid'
                 dense
                 fixedHeader
@@ -90,20 +94,4 @@ const Users = (props) => {
     )
 }
 
-function mapStateToProps(state, ownProps) {
-    if (state.users.length > 0) {
-        return {
-            users: state.users
-        };
-    } else {
-        return {
-            users: []
-        }
-    }
-}
-  
-function mapDispatchToProps(dispatch) {
-    return { actions: bindActionCreators(actions, dispatch) }
-}
-  
-export default connect(mapStateToProps, mapDispatchToProps)(Users);
+export default Users;

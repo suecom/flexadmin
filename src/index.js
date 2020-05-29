@@ -3,6 +3,10 @@ import { render } from 'react-dom';
 
 import App from './App';
 
+console.log(process.env)
+
+
+
 //import * as serviceWorker from './serviceWorker';
 
 render(

@@ -9,10 +9,8 @@ export function loadUsers() {
     return function(dispatch) {
         const api = new userApi();
 
-        return api.getUsers().then(users => {
-            dispatch(loadUsersSuccess(users));
-        }).catch(error => {
-            throw(error);
-        });
+        return api.getUsers()
+            .then(users => dispatch(loadUsersSuccess(users)))
+            .catch(error => {throw(error)})
     };
 }

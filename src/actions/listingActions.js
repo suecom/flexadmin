@@ -9,10 +9,8 @@ export function loadListings() {
     return function(dispatch) {
         const api = new listingApi();
 
-        return api.getListings().then(listings => {
-            dispatch(loadListingsSuccess(listings));
-        }).catch(error => {
-            throw(error);
-        });
+        return api.getListings()
+            .then(listings => dispatch(loadListingsSuccess(listings)))
+            .catch(error => { throw(error) });
     };
 }

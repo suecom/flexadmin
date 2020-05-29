@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import configureStore from './store/configureStore';
 import { loadUsers } from './actions/userActions';
 import { loadListings } from './actions/listingActions';
+import { loadTransactions } from './actions/transactionActions';
 
 import Header from './components/Header';
 import SideBar from './components/SideBar';
@@ -17,6 +18,7 @@ const store = configureStore();
 // Load it all
 store.dispatch(loadUsers());
 store.dispatch(loadListings());
+store.dispatch(loadTransactions());
 
 const App = (props) => {
   const [ filter, setFilter ] = useState('');
