@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import BrandLink from './BrandLink';
 import routes from '../routes';
@@ -14,10 +14,10 @@ const SideBar = (props) =>  {
                     <ul className="nav nav-pills nav-sidebar flex-column" role="menu" data-accordion="false">
                         {routes.map((route, index) => (
                             <li className="nav-item" key={index}>
-                                <Link to={route.path} className="nav-link">
+                                <NavLink to={route.path} className="nav-link">
                                     <i className={route.icon}></i>
                                     <p>{route.label}</p>
-                                </Link>
+                                </NavLink>
                             </li>
                         ))}
                     </ul>

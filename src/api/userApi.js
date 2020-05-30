@@ -1,10 +1,4 @@
-import * as flexIntegrationSdk from 'sharetribe-flex-integration-sdk';
-
-const integrationSdk = flexIntegrationSdk.createInstance({
-    clientId: '58a55f71-7650-423f-bbd3-b4f5e61927b7', //process.env.FLEX_INTEGRATION_CLIENT_ID,
-    clientSecret: '14cd97d21409e22c720e58fbf872a2113fb7d1e2', //process.env.FLEX_INTEGRATION_CLIENT_SECRET,
-    baseUrl: process.env.FLEX_INTEGRATION_BASE_URL || /*'https://flex-api.sharetribe.com''http://localhost:8080/'*/'https://ffs.oldencars.com',
-});
+import integrationSdk from './../flexsdk';
 
 class UserApi {
     getPage(page) {

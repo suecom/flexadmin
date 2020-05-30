@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Header = (props) => {
+const Header = ({ filterText, setFilterText }) => {
     function onChange(e) {
-        props.cb(e.target.value.toLowerCase())
+        setFilterText(e.target.value)
     }
 
     return (
@@ -15,7 +15,7 @@ const Header = (props) => {
             </ul>
             {/* Search */}
             <div className="input-group input-group-sm">
-                <input className="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search" onChange={onChange} />
+                <input className="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search" onChange={onChange} value={filterText}/>
                 <div className="input-group-append">
                     <button className="btn btn-navbar" type="submit">
                         <i className="fas fa-search" />

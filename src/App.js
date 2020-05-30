@@ -21,19 +21,15 @@ store.dispatch(loadListings());
 store.dispatch(loadTransactions());
 
 const App = (props) => {
-  const [ filter, setFilter ] = useState('');
+  const [ filter, setFilterText ] = useState('');
   
-  function changeFilter(value) {
-    setFilter(value)
-  }
-
   return (
     <div className="wrapper">
       <Provider store={store}>
         <Router>
-          <Header cb={ changeFilter } />
+          <Header filterText={ filter } setFilterText={ setFilterText } { ...props } />
           <SideBar  />
-          <Content filterText={ filter } { ...props } />
+          <Content filterText={ filter } setFilterText={ setFilterText } { ...props } />
           <Footer />
         </Router>
       </Provider>
