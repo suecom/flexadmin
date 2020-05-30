@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 
-
 const columns = (clickHandler => [
     {
         name: 'Name',
@@ -84,7 +83,7 @@ const Users = ({ filterText, setFilterText }) => {
         history.replace(location.pathname, { filterText: filterText });
 
         // This then redirects using the query to update filterText
-        history.push('/transactions?search=' + user[0].attributes.email);
+        history.push('/listings?search=' + user[0].attributes.email);
     }
     
     useEffect(() => {
@@ -105,7 +104,6 @@ const Users = ({ filterText, setFilterText }) => {
                                                             CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
         user.reviews = reviews.filter(review => review.relationships.subject.data.id.uuid === user.id.uuid).length;
     })
-
 
     return (
         <div className="animated fadeIn  ">
