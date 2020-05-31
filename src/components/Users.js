@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 
-const columns = (clickHandler => [
+const columns = ((clickListing, clickTransaction, clickReviews) => [
     {
         name: 'Name',
         format: row => row.attributes.profile.firstName + ' ' + row.attributes.profile.lastName,
@@ -29,7 +29,7 @@ const columns = (clickHandler => [
         sortable: true,
         width: '70px',
         compact: false,
-        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickHandler} value={row.id.uuid}>{row.clients}</button>,
+        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickTransaction} value={row.id.uuid}>{row.clients}</button>,
         ignoreRowClick: true,
     },
     {
@@ -38,7 +38,7 @@ const columns = (clickHandler => [
         sortable: true,
         width: '70px',
         compact: false,
-        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickHandler} value={row.id.uuid}>{row.rentals}</button>,
+        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickTransaction} value={row.id.uuid}>{row.rentals}</button>,
         ignoreRowClick: true,
     },
     {
@@ -47,7 +47,7 @@ const columns = (clickHandler => [
         sortable: true,
         width: '70px',
         compact: false,
-        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickHandler} value={row.id.uuid}>{row.listings}</button>,
+        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickListing} value={row.id.uuid}>{row.listings}</button>,
         ignoreRowClick: true,
     },
     {
@@ -56,7 +56,7 @@ const columns = (clickHandler => [
         sortable: true,
         width: '70px',
         compact: false,  
-        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickHandler} value={row.id.uuid}>{row.reviews}</button>,
+        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid}>{row.reviews}</button>,
         ignoreRowClick: true,
     },
 ]);
@@ -76,7 +76,7 @@ const Users = ({ filterText, setFilterText }) => {
                 user.attributes.profile.lastName.toLowerCase().includes(filterText.toLowerCase()));
     }
 
-    function handleButtonClick(e)  {
+    function clickListing(e)  {
         const user = users.filter(user => user.id.uuid === e.target.value);
         
         // This set the state for this location
@@ -84,6 +84,26 @@ const Users = ({ filterText, setFilterText }) => {
 
         // This then redirects using the query to update filterText
         history.push('/listings?search=' + user[0].attributes.email);
+    }
+
+    function clickTransaction(e)  {
+        const user = users.filter(user => user.id.uuid === e.target.value);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/transactions?search=' + user[0].attributes.email);
+    }
+
+    function clickReviews(e)  {
+        const user = users.filter(user => user.id.uuid === e.target.value);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/reviews?search=' + user[0].attributes.email);
     }
     
     useEffect(() => {
@@ -109,7 +129,7 @@ const Users = ({ filterText, setFilterText }) => {
         <div className="animated fadeIn  ">
             <DataTable
                 title = 'Users'
-                columns = { columns(handleButtonClick) }
+                columns = { columns(clickListing, clickTransaction, clickReviews) }
                 data = { users.filter(user => filterUser(user)) }
                 keyField = 'id.uuid'
                 dense

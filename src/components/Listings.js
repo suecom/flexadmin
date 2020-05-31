@@ -3,12 +3,12 @@ import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 
-const columns = (clickHandler => [
+const columns = ((clickTransactions, clickReviews) => [
     {
         name: 'Title',
         selector: 'attributes.title',
         sortable: true,
-        maxWidth: '150px'
+        maxWidth: '150px',
     },
     {
         name: 'Make',
@@ -25,16 +25,10 @@ const columns = (clickHandler => [
         width: '100px',
     },
     {
-        name: 'Year',
-        selector: 'attributes.publicData.year',
-        sortable: true,
-        compact: true,
-        width: '40px',
-    },
-    {
         name: 'Owner',
         selector: 'email',
         sortable: true,
+        compact: true,
     },
     {
         name: 'Enquiries',
@@ -42,7 +36,7 @@ const columns = (clickHandler => [
         sortable: true,
         width: '70px',
         compact: false,
-        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickHandler} value={row.id.uuid}>{row.enquire}</button>,
+        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickTransactions} value={row.id.uuid}>{row.enquire}</button>,
         ignoreRowClick: true,
     },
     {
@@ -51,7 +45,16 @@ const columns = (clickHandler => [
         sortable: true,
         width: '70px',
         compact: false,
-        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickHandler} value={row.id.uuid}>{row.rentals}</button>,
+        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickTransactions} value={row.id.uuid}>{row.rentals}</button>,
+        ignoreRowClick: true,
+    },
+    {
+        name: 'Reviews',
+        selector: 'reviews',
+        sortable: true,
+        width: '70px',
+        compact: false,
+        cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid}>{row.reviews}</button>,
         ignoreRowClick: true,
     },
 ]);
@@ -72,7 +75,17 @@ const Listings = ({ filterText, setFilterText }) => {
                 listing.attributes.publicData.model.toLowerCase().includes(filterText.toLowerCase()));
     }
 
-    function handleButtonClick(e)  {
+    function clickReviews(e)  {
+        const listing = listings.filter(listing => listing.id.uuid === e.target.value);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/reviews?search=' + listing[0].email);
+    }
+
+    function clickTransactions(e)  {
         const listing = listings.filter(listing => listing.id.uuid === e.target.value);
         
         // This set the state for this location
@@ -98,13 +111,15 @@ const Listings = ({ filterText, setFilterText }) => {
                                                 EnquiryTransitions.includes(transaction.attributes.lastTransition)).length;
         listing.rentals = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid &&
                                                 CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
+        listing.reviews = reviews.filter(review => review.relationships.listing.data.id.uuid === listing.id.uuid &&
+                                                review.relationships.subject.data.id.uuid === listing.relationships.author.data.id.uuid).length;
     })
 
     return (
         <div className="animated fadeIn  ">
             <DataTable
                 title = 'Listings'
-                columns = { columns(handleButtonClick) }
+                columns = { columns(clickTransactions, clickReviews) }
                 data = { listings.filter(listing => filterListing(listing)) }
                 keyField = 'id.uuid'
                 dense

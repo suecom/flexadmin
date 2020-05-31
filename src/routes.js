@@ -1,5 +1,6 @@
 import Users from './components/Users';
 import Listings from './components/Listings';
+import Transactions from './components/Transactions';
 
 const routes = [
     {
@@ -19,7 +20,7 @@ const routes = [
       path: "/transactions",
       label: 'Transactions',
       icon: 'fas fa-pound-sign nav-icon',
-      component: Users
+      component: Transactions
     },
     {
         path: "/reviews",
