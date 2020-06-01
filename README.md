@@ -1,8 +1,10 @@
 # flex admin console
 
-This is a Flex Integration SDK application. A little more ambitious than the SDK examples, it relies on the same backend API.
+This is a Flex Integration SDK application. A little more ambitious than the Sharetribe SDK examples, it relies on the same backend API. It's slightly hard-coded to our marketplace (publicData), but is trivial to change to yours. Look at the various entity (Users, Listing, Transaction) pages to customize
 
-This is an alternate admin console built on the Flex integration SDK. The motivation is to allow the use of FFS backend API provider in production. In effect, this is the FFS console app. Hopefully you'll prefer it to the Sharetribe console, and can use it instead of, or as well as their console app.
+This is an alternate admin console. The motivation is to allow the use of the FFS backend API provider in production. In effect, this is the FFS console app. Hopefully you'll prefer it to the Sharetribe console, and can use it instead of, or as well as their console app.
+
+Styling is taken from CoreUIs AdminLTE template, and I apologise in advance for my lack of UI design skills. Maybe you could improve?
 
 ## Quick start (no such thing!)
 

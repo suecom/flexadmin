@@ -30,9 +30,10 @@ class TransactionApi {
                     includes = includes.concat(res.data.included);
                 })
 
-                const reviews = includes !== undefined ? includes.filter(review => review.type === 'review') : [];
+                const reviews = includes !== undefined ? includes.filter(item => item.type === 'review') : [];
+                const messages = includes !== undefined ? includes.filter(item => item.type === 'message') : [];
 
-                return { transactions, reviews };
+                return { transactions, reviews, messages };
             })
     }
 }

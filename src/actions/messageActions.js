@@ -2,10 +2,10 @@ import * as types from './actionTypes';
 import transactionApi from '../api/transactionApi';
 
 import { loadTransactionsSuccess } from './transactionActions';
-import { loadMessagesSuccess } from './messageActions'
+import { loadReviewsSuccess } from './reviewActions'
 
-export function loadReviewsSuccess(reviews) {
-    return {type: types.LOAD_REVIEWS_SUCCESS, reviews};
+export function loadMessagesSuccess(messages) {
+    return {type: types.LOAD_MESSAGES_SUCCESS, messages};
 }
 
 export function loadReviews() {

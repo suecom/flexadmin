@@ -3,4 +3,5 @@ export default {
     listings: [],
     transactions: [],
     reviews: [],
+    messages: [],
 }

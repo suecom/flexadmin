@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
+import Mark from 'mark.js';
 
 const columns = ((clickListing, clickTransaction, clickReviews) => [
     {
@@ -107,14 +108,20 @@ const Users = ({ filterText, setFilterText }) => {
     }
     
     useEffect(() => {
+        var instance = new Mark("div.animated");
+
         // Update the search filter according to router
         if(location.search.indexOf('search') !== -1) {
             setFilterText(location.search.substr(location.search.indexOf('=')+1));
+            location.search = '';
+            location.state = null;
         }
         else if(location.state !== null && location.state.filterText !== undefined) {
             setFilterText(location.state.filterText);
         } 
-    }, [location, setFilterText])
+
+        instance.mark(filterText, { 'element': 'span', 'className': 'markYellow', 'separateWordSearch': true });
+    })
 
     users.forEach(user => {
         user.listings = listings.filter(listing => listing.relationships.author.data.id.uuid === user.id.uuid).length;

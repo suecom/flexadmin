@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
+import Mark from 'mark.js';
 
-const columns = ((clickTransactions, clickReviews) => [
+const columns = ((clickTransactions, clickReviews, clickUser) => [
     {
         name: 'Title',
         selector: 'attributes.title',
@@ -26,10 +27,11 @@ const columns = ((clickTransactions, clickReviews) => [
     },
     {
         name: 'Owner',
-        selector: 'email',
+        cell: row => { return(<a type="button" onClick={clickUser} rel={row.ownerId}>{row.owner}</a>) },
+        selector: 'owner',
         sortable: true,
         compact: true,
-    },
+    },  
     {
         name: 'Enquiries',
         selector: 'enquire',
@@ -70,7 +72,9 @@ const Listings = ({ filterText, setFilterText }) => {
     const EnquiryTransitions = ['transition/request-payment','transition/request-payment-after-enquiry','transition/expire-payment','transition/decline','transition/expire'];
     
     function filterListing(listing) {
-        return (listing.email.toLowerCase().includes(filterText.toLowerCase()) ||
+        return (listing.owner.toLowerCase().includes(filterText.toLowerCase()) ||
+                listing.ownerEmail.toLowerCase().includes(filterText.toLowerCase()) ||
+                listing.attributes.title.toLowerCase().includes(filterText.toLowerCase()) ||
                 listing.attributes.publicData.make.toLowerCase().includes(filterText.toLowerCase()) ||
                 listing.attributes.publicData.model.toLowerCase().includes(filterText.toLowerCase()));
     }
@@ -92,21 +96,41 @@ const Listings = ({ filterText, setFilterText }) => {
         history.replace(location.pathname, { filterText: filterText });
 
         // This then redirects using the query to update filterText
-        history.push('/transactions?search=' + listing[0].email);
+        history.push('/transactions?search=' + listing[0].ownerEmail);
+    }
+
+    function clickUser(e)  {
+        const user = users.filter(user => user.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/users?search=' + user[0].attributes.email);
     }
     
     useEffect(() => {
+        var instance = new Mark("div.animated");
+
         // Update the search filter according to router
         if(location.search.indexOf('search') !== -1) {
             setFilterText(location.search.substr(location.search.indexOf('=')+1));
+            location.search = '';
+            location.state = null;
         }
         else if(location.state !== null && location.state.filterText !== undefined) {
             setFilterText(location.state.filterText);
         } 
-    }, [location, setFilterText])
+
+        instance.mark(filterText, { 'element': 'span', 'className': 'markYellow', 'separateWordSearch': true });
+    })
 
     listings.forEach(listing => {
-        listing.email = users.filter(user => listing.relationships.author.data.id.uuid === user.id.uuid)[0].attributes.email;
+        const u = users.filter(user => listing.relationships.author.data.id.uuid === user.id.uuid);
+        listing.owner = u[0].attributes.profile.firstName + ' ' + u[0].attributes.profile.lastName;
+        listing.ownerId = u[0].id.uuid;
+        listing.ownerEmail = u[0].attributes.email;
+        
         listing.enquire = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid &&
                                                 EnquiryTransitions.includes(transaction.attributes.lastTransition)).length;
         listing.rentals = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid &&
@@ -119,7 +143,7 @@ const Listings = ({ filterText, setFilterText }) => {
         <div className="animated fadeIn  ">
             <DataTable
                 title = 'Listings'
-                columns = { columns(clickTransactions, clickReviews) }
+                columns = { columns(clickTransactions, clickReviews, clickUser) }
                 data = { listings.filter(listing => filterListing(listing)) }
                 keyField = 'id.uuid'
                 dense

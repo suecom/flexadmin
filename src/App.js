@@ -30,7 +30,7 @@ const App = (props) => {
           <Header filterText={ filter } setFilterText={ setFilterText } { ...props } />
           <SideBar  />
           <Content filterText={ filter } setFilterText={ setFilterText } { ...props } />
-          <Footer />
+          {/*<Footer />*/}
         </Router>
       </Provider>
     </div>
