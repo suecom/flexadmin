@@ -8,6 +8,9 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v0.3.0]
+
+Added transactions to the expanded functional framework
 
 ## [v0.2.0]
 
