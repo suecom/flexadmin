@@ -13,7 +13,7 @@ const renderMergedProps = (component, ...rest) => {
 
 const Content = (props) => {
     return (
-        <div className="content-wrapper">
+        <div className="content-wrapper">            
             <Switch>
                 {routes.map((route, index) => (
                     <Route {...props}
