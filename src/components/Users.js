@@ -39,7 +39,7 @@ const Users = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickProvided} value={row.id.uuid} disabled={row.clients===0}>{row.clients}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickProvided} value={row.id.uuid} disabled={row.clients===0}>{row.clients}</button>,
             ignoreRowClick: true,
         },  
         {
@@ -48,7 +48,7 @@ const Users = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickRented} value={row.id.uuid} disabled={row.rentals===0}>{row.rentals}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickRented} value={row.id.uuid} disabled={row.rentals===0}>{row.rentals}</button>,
             ignoreRowClick: true,
         },
         {
@@ -57,7 +57,7 @@ const Users = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickListing} value={row.id.uuid} disabled={row.listings===0}>{row.listings}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickListing} value={row.id.uuid} disabled={row.listings===0}>{row.listings}</button>,
             ignoreRowClick: true,
         },
         {
@@ -66,7 +66,7 @@ const Users = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,  
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
     ];
@@ -168,7 +168,7 @@ const Users = ({ filterText, setFilterText }) => {
         for(const term of filterText.split(',')) {
             instance.mark(term, { 
                 'element': 'span', 
-                'className': 'markYellow',              
+                'className': 'markGreen',              
             });
         }
     })

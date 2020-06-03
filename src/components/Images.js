@@ -7,8 +7,8 @@ import Mark from 'mark.js';
 const Images = ({ filterText, setFilterText }) => {
     const location = useLocation();
     const history = useHistory();
-    const images = useSelector(state => state.images);
     const users = useSelector(state => state.users);
+    const images = useSelector(state => state.images);
     const listings = useSelector(state => state.listings);
     const columns = [
         {
@@ -26,7 +26,7 @@ const Images = ({ filterText, setFilterText }) => {
         },   
         {
             name: 'Image',
-            cell: row => { return (<img className='img-size-50 mr-3 img-circle' alt='image' src={ row.attributes.variants['square-small'].url } />) },
+            cell: row => { return (<img className='img-size-50 mr-3 img-circle' alt='help' src={ row.attributes.variants['default'].url } />) },
         },  
     ];
     const customStyles = {
@@ -98,14 +98,14 @@ const Images = ({ filterText, setFilterText }) => {
         for(const term of filterText.split(',')) {
             instance.mark(term, { 
                 'element': 'span', 
-                'className': 'markYellow',              
+                'className': 'markGreen',              
             });
         }
     })
 
     const imagesPlus = () => {
         images.forEach(image => {
-            const user = users.filter(user => user.relationships.profileImage.data != null ? user.relationships.profileImage.data.id.uuid === image.id.uuid : false);
+            const user = users.filter(u => u.relationships !== undefined && u.relationships.profileImage !== undefined && u.relationships.profileImage.data !== undefined && u.relationships.profileImage.data !== null ? u.relationships.profileImage.data.id.uuid === image.id.uuid : false);
 
             if(user.length > 0) {
                 image.name = user[0].attributes.profile.firstName + ' ' + user[0].attributes.profile.lastName;
@@ -120,10 +120,10 @@ const Images = ({ filterText, setFilterText }) => {
                     if(list.length > 0) {
                         image.name = listing.attributes.title;
                         image.nameId = listing.id.uuid;
+                        image.userEmail = '';
+                        image.origin = 'Listing';
                     }
-                })
-                image.userEmail = '';
-                image.origin = 'Listing';
+                })  
             }
         })
 

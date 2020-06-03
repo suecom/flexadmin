@@ -40,7 +40,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             compact: true,
         },   
         {
-            name: 'Car',
+            name: 'Regards',
             cell: row => { return(<a type="button" onClick={clickListing} rel={row.listingId}>{row.listing}</a>) },
             selector: 'listing',
             sortable: true,
@@ -60,7 +60,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,  
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickMessages} value={row.id.uuid} disabled={row.messages===0}>{row.messages}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickMessages} value={row.id.uuid} disabled={row.messages===0}>{row.messages}</button>,
             ignoreRowClick: true,
         },
         {
@@ -69,7 +69,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,  
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
     ];
@@ -164,7 +164,7 @@ const Transactions = ({ filterText, setFilterText }) => {
         for(const term of filterText.split(',')) {
             instance.mark(term, { 
                 'element': 'span', 
-                'className': 'markYellow',              
+                'className': 'markGreen',              
             });
         }
     });
@@ -172,21 +172,47 @@ const Transactions = ({ filterText, setFilterText }) => {
     const transactionsPlus = () => {
         transactions.forEach(transaction => {
             const p = users.filter(user => transaction.relationships.provider.data.id.uuid === user.id.uuid);
-            transaction.provider = p[0].attributes.profile.firstName + ' ' + p[0].attributes.profile.lastName;
-            transaction.providerId = p[0].id.uuid;
-            transaction.providerEmail = p[0].attributes.email;
 
-            const c = users.filter(user => transaction.relationships.customer.data.id.uuid === user.id.uuid);          
-            transaction.customer = c[0].attributes.profile.firstName + ' ' + c[0].attributes.profile.lastName;
-            transaction.customerId = c[0].id.uuid;
-            transaction.customerEmail = c[0].attributes.email;
+            if(p.length > 0) {
+                transaction.provider = p[0].attributes.profile.firstName + ' ' + p[0].attributes.profile.lastName;
+                transaction.providerId = p[0].id.uuid;
+                transaction.providerEmail = p[0].attributes.email;
+            }
+            else {
+                transaction.provider = '<deleted>';
+                transaction.providerId = '0';
+                transaction.providerEmail = '';
+            }
+
+            const c = users.filter(user => transaction.relationships.customer.data.id.uuid === user.id.uuid);
+            
+            if(c.length > 0) {
+                transaction.customer = c[0].attributes.profile.firstName + ' ' + c[0].attributes.profile.lastName;
+                transaction.customerId = c[0].id.uuid;
+                transaction.customerEmail = c[0].attributes.email;
+            }
+            else {
+                transaction.customer = '<deleted>';
+                transaction.customerId = '0';
+                transaction.customerEmail = '';
+            }
             
             const l = listings.filter(listing => transaction.relationships.listing.data.id.uuid === listing.id.uuid);
-            transaction.listingId = l.length > 0 ? l[0].id.uuid : 0;  
-            transaction.listing = l.length > 0 ? l[0].attributes.title : '';
+            if(l.length > 0) {
+                transaction.listingId = l[0].id.uuid;  
+                transaction.listing = l[0].attributes.title;
+            }
+            else {
+                transaction.listingId = '0';  
+                transaction.listing = '<deleted>';
+            }
             
             transaction.reviews = transaction.relationships.reviews.data.length;
             transaction.messages = transaction.relationships.messages.data.length;
+
+            if(transaction.attributes.payinTotal === null) {
+                transaction.attributes.payinTotal = { amount: 0, currency: 'GBP' };
+            }
         })
 
         return transactions;

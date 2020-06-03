@@ -6,7 +6,7 @@ import routes from '../routes';
 
 const SideBar = (props) =>  {
     return (
-        <aside className="main-sidebar sidebar-dark-primary elevation-4">
+        <aside className="main-sidebar  sidebar-dark-green elevation-4">
             <BrandLink logo="logo.png" />
             {/* Sidebar */}
             <div className="sidebar">

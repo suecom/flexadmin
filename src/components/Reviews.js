@@ -64,6 +64,8 @@ const Reviews = ({ filterText, setFilterText }) => {
         for(var i = 0; i < terms.length && terms[i].length > 0 && retVal === false; i++) {
             retVal = review.author.toLowerCase().search(terms[i]) !== -1 ||
                     review.subject.toLowerCase().search(terms[i]) !== -1 ||
+                    review.authorEmail.toLowerCase().search(terms[i]) !== -1 ||
+                    review.subjectEmail.toLowerCase().search(terms[i]) !== -1 ||
                     review.id.uuid.toLowerCase().search(terms[i]) !== -1 
         }
 
@@ -107,7 +109,7 @@ const Reviews = ({ filterText, setFilterText }) => {
         for(const term of filterText.split(',')) {
             instance.mark(term, { 
                 'element': 'span', 
-                'className': 'markYellow',              
+                'className': 'markGreen',              
             });
         }
     })
@@ -115,16 +117,25 @@ const Reviews = ({ filterText, setFilterText }) => {
     const reviewsPlus = () => {
         reviews.forEach(review => {
             const a = users.filter(user => review.relationships.author.data.id.uuid === user.id.uuid);
-            review.author = a[0].attributes.profile.firstName + ' ' + a[0].attributes.profile.lastName;
-            review.authorId = a[0].id.uuid;
+
+            if(a.length > 0) {
+                review.author = a[0].attributes.profile.firstName + ' ' + a[0].attributes.profile.lastName;
+                review.authorEmail = a[0].attributes.email;
+                review.authorId = a[0].id.uuid;
+            }
 
             const s = users.filter(user => review.relationships.subject.data.id.uuid === user.id.uuid);
-            review.subject = s[0].attributes.profile.firstName + ' ' + s[0].attributes.profile.lastName;
-            review.subjectId = s[0].id.uuid;
 
-            var k = [];
-            var j = <span className="fa fa-star checked"></span>;
+            if(s.length > 0) {
+                review.subject = s[0].attributes.profile.firstName + ' ' + s[0].attributes.profile.lastName;
+                review.subjectEmail = s[0].attributes.email;
+                review.subjectId = s[0].id.uuid;
+            }
+
+            var k = []; 
             for(var i = 0; i < review.attributes.rating; i++) {
+                var j = <span key={i} className="btn-outline-success fa fa-star checked"></span>;
+
                 k.push(j)
             }
             review.stars = k;

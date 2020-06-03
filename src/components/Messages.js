@@ -55,6 +55,8 @@ const Messages = ({ filterText, setFilterText }) => {
         for(var i = 0; i < terms.length && terms[i].length > 0 && retVal === false; i++) {
             retVal = message.author.toLowerCase().search(terms[i]) !== -1 ||
                     message.subject.toLowerCase().search(terms[i]) !== -1 ||
+                    message.authorEmail.toLowerCase().search(terms[i]) !== -1 ||
+                    message.subjectEmail.toLowerCase().search(terms[i]) !== -1 ||
                     message.id.uuid.toLowerCase().search(terms[i]) !== -1 
         }
 
@@ -98,7 +100,7 @@ const Messages = ({ filterText, setFilterText }) => {
         for(const term of filterText.split(',')) {
             instance.mark(term, { 
                 'element': 'span', 
-                'className': 'markYellow',              
+                'className': 'markGreen',              
             });
         }
     })
@@ -106,26 +108,43 @@ const Messages = ({ filterText, setFilterText }) => {
     const messagesPlus = () => {
         messages.forEach(message => {
             const a = users.filter(user => message.relationships.sender.data.id.uuid === user.id.uuid);
-            message.author = a[0].attributes.profile.firstName + ' ' + a[0].attributes.profile.lastName;
-            message.authorId = a[0].id.uuid;
+
+            if(a.length > 0) {
+                message.author = a[0].attributes.profile.firstName + ' ' + a[0].attributes.profile.lastName;         
+                message.authorId = a[0].id.uuid;
+                message.authorEmail = a[0].attributes.email;
+            }
+            else {
+                message.author = '<deleted>';
+                message.authorId = '0';
+                message.authorEmail = '';
+            }
+            
 
             // For all the transactions
             for(const tran of transactions) {
                 // Search through all the messages for this one....
                 for(const mess of tran.relationships.messages.data) {
                     if(message.id.uuid === mess.id.uuid) {
+                        var s = [];
+
                         // If the message is from the provider, then the subject is the customer, and vice-versa
                         if(message.relationships.sender.data.id.uuid === tran.relationships.provider.data.id.uuid) {
-                            const s = users.filter(user => tran.relationships.customer.data.id.uuid === user.id.uuid);
+                            s = users.filter(user => tran.relationships.customer.data.id.uuid === user.id.uuid);
+                        }
+                        else {
+                            s = users.filter(user => tran.relationships.provider.data.id.uuid === user.id.uuid);
+                        }
 
+                        if(s.length > 0) {
                             message.subject = s[0].attributes.profile.firstName + ' ' + s[0].attributes.profile.lastName;
+                            message.subjectEmail = s[0].attributes.email;
                             message.subjectId = s[0].id.uuid;
                         }
                         else {
-                            const s = users.filter(user => tran.relationships.provider.data.id.uuid === user.id.uuid);
-
-                            message.subject = s[0].attributes.profile.firstName + ' ' + s[0].attributes.profile.lastName;
-                            message.subjectId = s[0].id.uuid;
+                            message.subject = '<deleted>'
+                            message.subjectEmail = '';
+                            message.subjectId = '0';
                         }
                     }
                 }

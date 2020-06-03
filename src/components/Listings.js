@@ -57,7 +57,7 @@ const Listings = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickEnquiries} value={row.id.uuid} disabled={row.enquires===0}>{row.enquires}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickEnquiries} value={row.id.uuid} disabled={row.enquires===0}>{row.enquires}</button>,
             ignoreRowClick: true,
         },
         {
@@ -66,7 +66,7 @@ const Listings = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickRented} value={row.id.uuid} disabled={row.rentals===0}>{row.rentals}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickRented} value={row.id.uuid} disabled={row.rentals===0}>{row.rentals}</button>,
             ignoreRowClick: true,
         },
         {
@@ -75,7 +75,7 @@ const Listings = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
     ];
@@ -181,7 +181,7 @@ const Listings = ({ filterText, setFilterText }) => {
         for(const term of filterText.split(',')) {
             instance.mark(term, { 
                 'element': 'span', 
-                'className': 'markYellow',              
+                'className': 'markGreen',              
             });
         }
     }) 
@@ -189,16 +189,28 @@ const Listings = ({ filterText, setFilterText }) => {
     const listingsPlus = () => {
         listings.forEach(listing => {
             const u = users.filter(user => listing.relationships.author.data.id.uuid === user.id.uuid);
-            listing.owner = u[0].attributes.profile.firstName + ' ' + u[0].attributes.profile.lastName;
-            listing.ownerId = u[0].id.uuid;
-            listing.ownerEmail = u[0].attributes.email;
             
-            listing.enquires = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid &&
-                                                    EnquiryTransitions.includes(transaction.attributes.lastTransition)).length;
-            listing.rentals = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid &&
-                                                    CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
-            listing.reviews = reviews.filter(review => review.relationships.listing.data.id.uuid === listing.id.uuid &&
-                                                    review.relationships.subject.data.id.uuid === listing.relationships.author.data.id.uuid).length;
+            if(u.length > 0) {
+                listing.owner = u[0].attributes.profile.firstName + ' ' + u[0].attributes.profile.lastName;
+                listing.ownerId = u[0].id.uuid;
+                listing.ownerEmail = u[0].attributes.email;
+            }
+            
+            const trans = transactions !== undefined ? transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid) : [];
+            listing.enquires = trans.filter(t => EnquiryTransitions.includes(t.attributes.lastTransition)).length;
+            listing.rentals = trans.filter(t => CompletedTransitions.includes(t.attributes.lastTransition)).length;
+            listing.reviews = 0;
+            trans.forEach(t => {
+                if(t.relationships.reviews !== undefined && t.relationships.reviews.data !== undefined && t.relationships.reviews.data !== null) {
+                    t.relationships.reviews.data.forEach(r => {
+                        const rev = reviews.filter(r2 => r.id.uuid === r2.id.uuid);
+
+                        if(rev.length > 0 && rev[0].relationships.subject.data.id.uuid === listing.relationships.author.data.id.uuid) {
+                            listing.reviews += 1;
+                        }
+                    })
+                }
+            })
         })
 
         return listings;
