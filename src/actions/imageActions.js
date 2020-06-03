@@ -1,13 +1,13 @@
 import * as types from './actionTypes';
 import userApi from '../api/userApi';
 
-import { loadImagesSuccess } from './imageActions';
+import { loadUsersSuccess } from './userActions'
 
-export function loadUsersSuccess(users) {
-    return {type: types.LOAD_USERS_SUCCESS, users};
+export function loadImagesSuccess(images) {
+    return {type: types.LOAD_IMAGES_SUCCESS, images};
 }
 
-export function loadUsers() {
+export function loadImages() {
     return function(dispatch) {
         const api = new userApi();
 

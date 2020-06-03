@@ -10,7 +10,6 @@ import { loadTransactions } from './actions/transactionActions';
 import Header from './components/Header';
 import SideBar from './components/SideBar';
 import Content from './components/Content';
-import Footer from './components/Footer';
 
 // Initialize and load store
 const store = configureStore();
@@ -30,7 +29,6 @@ const App = (props) => {
           <Header filterText={ filter } setFilterText={ setFilterText } { ...props } />
           <SideBar  />
           <Content filterText={ filter } setFilterText={ setFilterText } { ...props } />
-          {/*<Footer />*/}
         </Router>
       </Provider>
     </div>

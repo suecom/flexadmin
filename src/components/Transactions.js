@@ -23,7 +23,7 @@ const Transactions = ({ filterText, setFilterText }) => {
         {
             name: 'On',
             format: row => new Date(row.attributes.lastTransitionedAt).toLocaleDateString(),
-            selector: 'attributes.lastTransitionedAt',
+            selector: 'attributes.createdAt',
             sortable: true,
             width: '95px',
         },
@@ -49,7 +49,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             compact: true,
         },
         {
-            name: 'Amount',
+            name: 'Value',
             selector: 'attributes.payinTotal.amount',
             format: row => formatter.format(row.attributes.payinTotal.amount/100),
             sortable: true,
@@ -62,7 +62,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,  
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickMessages} value={row.id.uuid}>{row.messages}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickMessages} value={row.id.uuid} disabled={row.messages==0}>{row.messages}</button>,
             ignoreRowClick: true,
         },
         {
@@ -71,7 +71,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,  
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid}>{row.reviews}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews==0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
     ];
@@ -113,23 +113,33 @@ const Transactions = ({ filterText, setFilterText }) => {
     }
 
     const clickMessages = (e) => {
-        const transaction = transactions.filter(transaction => transaction.id.uuid === e.target.value);
+        var searchStr = '';
+        const trans = transactions.filter(transaction => transaction.id.uuid === e.target.value);
         
+        for(const mess of trans[0].relationships.messages.data) {
+            searchStr = searchStr + mess.id.uuid.substr(mess.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
+
         // This set the state for this location
         history.replace(location.pathname, { filterText: filterText });
 
         // This then redirects using the query to update filterText
-        history.push('/messages?search=' /*+ user[0].attributes.email*/);
+        history.push('/messages?search=' + searchStr);
     }
 
     const clickReviews = (e) => {
-        const transaction = transactions.filter(transaction => transaction.id.uuid === e.target.value);
+        var searchStr = '';
+        const trans = transactions.filter(transaction => transaction.id.uuid === e.target.value);
+        
+        for(const rev of trans[0].relationships.reviews.data) {
+            searchStr = searchStr + rev.id.uuid.substr(rev.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
         
         // This set the state for this location
         history.replace(location.pathname, { filterText: filterText });
 
         // This then redirects using the query to update filterText
-        history.push('/reviews?search=' /*+ user[0].attributes.email*/);
+        history.push('/reviews?search=' + searchStr);
     }
 
     useEffect(() => {
@@ -180,7 +190,7 @@ const Transactions = ({ filterText, setFilterText }) => {
     const data = useMemo(() => transactionsPlus(), [transactions, listings, users, messages, reviews])
 
     return (
-        <div className="fadeIn">
+        <div className="animated fadeIn">
             <DataTable
                 title = 'Transactions'
                 columns = { columns }
@@ -190,8 +200,10 @@ const Transactions = ({ filterText, setFilterText }) => {
                 highlightOnHover
                 pointerOnHover
                 fixedHeader
-                fixedHeaderScrollHeight = "85vh"
-                noHeader           
+                fixedHeaderScrollHeight = '85vh'
+                noHeader
+                defaultSortField = 'attributes.createdAt' 
+                defaultSortAsc = { false }                    
             />
         </div>
     )

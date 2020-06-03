@@ -16,7 +16,7 @@ class UserApi {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
-                var promises = [], users  = res.data.data;
+                var promises = [], users  = res.data.data, includes = res.data.included;;
 
                 // Start any required requests
                 while(page < res.data.meta.totalPages) {
@@ -25,9 +25,14 @@ class UserApi {
 
                 // Wait for them to complete and add the results
                 const values = await Promise.all(promises);
-                values.map(res => users = users.concat(res.data.data))
+                values.forEach(res => {
+                    users = users.concat(res.data.data);
+                    includes = includes.concat(res.data.included);
+                })
 
-                return users;
+                const images = includes !== undefined ? includes.filter(item => item.type === 'image') : [];
+
+                return { users, images };
             })
         /*
         return fetch('http://localhost:8081/api/users').then(response => {

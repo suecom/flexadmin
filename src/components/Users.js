@@ -39,7 +39,7 @@ const Users = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickProvided} value={row.id.uuid}>{row.clients}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickProvided} value={row.id.uuid} disabled={row.clients==0}>{row.clients}</button>,
             ignoreRowClick: true,
         },  
         {
@@ -48,7 +48,7 @@ const Users = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickRented} value={row.id.uuid}>{row.rentals}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickRented} value={row.id.uuid} disabled={row.rentals==0}>{row.rentals}</button>,
             ignoreRowClick: true,
         },
         {
@@ -57,7 +57,7 @@ const Users = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickListing} value={row.id.uuid}>{row.listings}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickListing} value={row.id.uuid} disabled={row.listings==0}>{row.listings}</button>,
             ignoreRowClick: true,
         },
         {
@@ -66,7 +66,7 @@ const Users = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,  
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid}>{row.reviews}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews==0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
     ];
@@ -129,13 +129,19 @@ const Users = ({ filterText, setFilterText }) => {
     }
 
     const clickReviews = (e) => {
+        var searchStr = '';
         const user = users.filter(user => user.id.uuid === e.target.value);
+        const revs = reviews.filter(review => review.relationships.subject.data.id.uuid === user[0].id.uuid)
+        
+        for(const rev of revs) {
+            searchStr = searchStr + rev.id.uuid.substr(rev.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
         
         // This set the state for this location
         history.replace(location.pathname, { filterText: filterText });
 
         // This then redirects using the query to update filterText
-        history.push('/reviews?search=' + user[0].attributes.email);
+        history.push('/reviews?search=' + searchStr);
     }
     
     useEffect(() => {
@@ -176,7 +182,7 @@ const Users = ({ filterText, setFilterText }) => {
     const data = useMemo(() => usersPlus(), [transactions, listings, users, reviews])
 
     return (
-        <div className=" fadeIn">
+        <div className="animated fadeIn">
             <DataTable
                 title = 'Users'
                 columns = { columns }
@@ -187,7 +193,9 @@ const Users = ({ filterText, setFilterText }) => {
                 pointerOnHover
                 fixedHeader
                 fixedHeaderScrollHeight = "85vh"
-                noHeader           
+                noHeader  
+                defaultSortField = 'attributes.createdAt' 
+                defaultSortAsc = { false }            
             />
         </div>
     )

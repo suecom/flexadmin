@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
@@ -23,7 +23,7 @@ const Listings = ({ filterText, setFilterText }) => {
         },
         {
             name: 'Owner',
-            cell: row => { return(<a type="button" onClick={clickUser} rel={row.ownerId}>{row.owner}</a>) },
+            cell: row => { return(<a type="button" onClick={clickOwner} rel={row.ownerId}>{row.owner}</a>) },
             selector: 'owner',
             sortable: true,
             compact: true,
@@ -57,7 +57,7 @@ const Listings = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickEnquiries} value={row.id.uuid}>{row.enquire}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickEnquiries} value={row.id.uuid} disabled={row.enquires===0}>{row.enquires}</button>,
             ignoreRowClick: true,
         },
         {
@@ -66,7 +66,7 @@ const Listings = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickRented} value={row.id.uuid}>{row.rentals}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickRented} value={row.id.uuid} disabled={row.rentals===0}>{row.rentals}</button>,
             ignoreRowClick: true,
         },
         {
@@ -75,7 +75,7 @@ const Listings = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid}>{row.reviews}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
     ];
@@ -89,20 +89,28 @@ const Listings = ({ filterText, setFilterText }) => {
                 listing.ownerEmail.toLowerCase().search(terms[i]) !== -1 ||
                 listing.attributes.title.toLowerCase().search(terms[i]) !== -1 ||
                 listing.attributes.publicData.make.toLowerCase().search(terms[i]) !== -1 ||
-                listing.attributes.publicData.model.toLowerCase().search(terms[i]) !== -1
+                listing.attributes.publicData.model.toLowerCase().search(terms[i]) !== -1 ||
+                listing.id.uuid.toLowerCase().search(terms[i]) !== -1
         }
 
         return retVal;
     }
 
     const clickReviews = (e) => {
+        var searchStr = '';
         const listing = listings.filter(listing => listing.id.uuid === e.target.value);
+        const revs = reviews.filter(review => review.relationships.listing.data.id.uuid === listing[0].id.uuid &&
+                                                    review.relationships.subject.data.id.uuid === listing[0].relationships.author.data.id.uuid);
+        
+        for(const rev of revs) {
+            searchStr = searchStr + rev.id.uuid.substr(rev.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
         
         // This set the state for this location
         history.replace(location.pathname, { filterText: filterText });
 
         // This then redirects using the query to update filterText
-        history.push('/reviews?search=' + listing[0].email);
+        history.push('/reviews?search=' + searchStr);
     }
 
     const clickEnquiries = (e) => {
@@ -139,7 +147,7 @@ const Listings = ({ filterText, setFilterText }) => {
         history.push('/transactions?search=' + searchStr);
     }
 
-    const clickUser = (e) => {
+    const clickOwner = (e) => {
         const user = users.filter(user => user.id.uuid === e.target.rel);
         
         // This set the state for this location
@@ -178,7 +186,7 @@ const Listings = ({ filterText, setFilterText }) => {
             listing.ownerId = u[0].id.uuid;
             listing.ownerEmail = u[0].attributes.email;
             
-            listing.enquire = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid &&
+            listing.enquires = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid &&
                                                     EnquiryTransitions.includes(transaction.attributes.lastTransition)).length;
             listing.rentals = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid &&
                                                     CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
@@ -202,8 +210,10 @@ const Listings = ({ filterText, setFilterText }) => {
                 highlightOnHover
                 pointerOnHover
                 fixedHeader
-                fixedHeaderScrollHeight = "85vh"
-                noHeader           
+                fixedHeaderScrollHeight = '85vh'
+                noHeader 
+                defaultSortField = 'attributes.createdAt' 
+                defaultSortAsc = { false }             
             />
         </div>
     )

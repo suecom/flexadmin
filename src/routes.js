@@ -1,6 +1,9 @@
 import Users from './components/Users';
 import Listings from './components/Listings';
 import Transactions from './components/Transactions';
+import Reviews from './components/Reviews';
+import Messages from './components/Messages';
+import Images from './components/Images';
 
 const routes = [
     {
@@ -26,19 +29,19 @@ const routes = [
         path: "/reviews",
         label: 'Reviews',
         icon: 'fas fa-star nav-icon',
-        component: Users
+        component: Reviews
     },
     {
         path: "/messages",
         label: 'Messages',
         icon: 'fas fa-comments nav-icon',
-        component: Users
+        component: Messages
     },
     {
         path: "/images",
         label: 'Images',
         icon: 'far fa-image nav-icon',
-        component: Users
+        component: Images
     }
 ];
 

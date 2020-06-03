@@ -4,4 +4,5 @@ export default {
     transactions: [],
     reviews: [],
     messages: [],
+    images: [],
 }
