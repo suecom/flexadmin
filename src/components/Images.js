@@ -26,7 +26,7 @@ const Images = ({ filterText, setFilterText }) => {
         },   
         {
             name: 'Image',
-            cell: row => { return (<img className='img-size-50 mr-3 img-circle' alt='help' src={ row.attributes.variants['default'].url } />) },
+            cell: row => { return (<img className='img-size-50 mr-3 img-circle' alt='help' src={ row.url } />) },
         },  
     ];
     const customStyles = {
@@ -124,6 +124,16 @@ const Images = ({ filterText, setFilterText }) => {
                         image.origin = 'Listing';
                     }
                 })  
+            }
+
+            if(image.attributes.variants['square-small'].url !== undefined) {
+                image.url = image.attributes.variants['square-small'].url;
+            }
+            else if(image.attributes.variants['default'].url !== undefined) {
+                image.url = image.attributes.variants['default'].url;
+            }
+            else {
+                image.url = '';
             }
         })
 
