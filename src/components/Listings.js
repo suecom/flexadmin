@@ -79,6 +79,13 @@ const Listings = ({ filterText, setFilterText }) => {
             ignoreRowClick: true,
         },
     ];
+    const customStyles = {
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
+        }
+    };
 
     const filterListing = (listing) => {
         const terms = filterText.toLowerCase().split(',');
@@ -209,6 +216,7 @@ const Listings = ({ filterText, setFilterText }) => {
                 dense
                 highlightOnHover
                 pointerOnHover
+                customStyles = { customStyles }
                 fixedHeader
                 fixedHeaderScrollHeight = '85vh'
                 noHeader 

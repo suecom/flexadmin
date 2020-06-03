@@ -17,8 +17,6 @@ const Transactions = ({ filterText, setFilterText }) => {
     const listings = useSelector(state => state.listings); 
     const reviews = useSelector(state => state.reviews);
     const messages = useSelector(state => state.messages);
-    const CompletedTransitions = ['transition/review-2-by-customer','transition/review-2-by-provider','transition/complete','transition/review-1-by-provider','transition/review-1-by-customer','transition/expire-customer-review-period','transition/expire-review-period'];
-    const EnquiryTransitions = ['transition/request-payment','transition/request-payment-after-enquiry','transition/expire-payment','transition/decline','transition/expire'];
     const columns = [
         {
             name: 'On',
@@ -62,7 +60,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,  
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickMessages} value={row.id.uuid} disabled={row.messages==0}>{row.messages}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickMessages} value={row.id.uuid} disabled={row.messages===0}>{row.messages}</button>,
             ignoreRowClick: true,
         },
         {
@@ -71,10 +69,17 @@ const Transactions = ({ filterText, setFilterText }) => {
             sortable: true,
             width: '70px',
             compact: false,  
-            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews==0}>{row.reviews}</button>,
+            cell: row => <button className="btn btn-xs btn-block btn-primary" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
     ];
+    const customStyles = {
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
+        },
+    }
     
     const filterTransaction = (transaction) => {
         const terms = filterText.toLowerCase().split(',');
@@ -199,6 +204,7 @@ const Transactions = ({ filterText, setFilterText }) => {
                 dense
                 highlightOnHover
                 pointerOnHover
+                customStyles = { customStyles }
                 fixedHeader
                 fixedHeaderScrollHeight = '85vh'
                 noHeader

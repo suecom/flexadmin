@@ -8,9 +8,7 @@ const Reviews = ({ filterText, setFilterText }) => {
     const location = useLocation();
     const history = useHistory();
     const users = useSelector(state => state.users);
-    const transactions = useSelector(state => state.transactions);
     const reviews = useSelector(state => state.reviews);
-    const CompletedTransitions = ['transition/review-2-by-customer','transition/review-2-by-provider','transition/complete','transition/review-1-by-provider','transition/review-1-by-customer','transition/expire-customer-review-period','transition/expire-review-period'];
     const columns = [
         {
             name: 'Sent',
@@ -37,10 +35,11 @@ const Reviews = ({ filterText, setFilterText }) => {
         },
         {
             name: 'Rating',
+            cell: row => { return ( row.stars ) },
             selector: 'attributes.rating',
             sortable: true,
             compact: true,
-            right: true,
+            //right: true,
             width: '70px',
         },
         {
@@ -50,6 +49,13 @@ const Reviews = ({ filterText, setFilterText }) => {
             compact: false,
         },  
     ];
+    const customStyles = {
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
+        }
+    };
     
     const filterReview = (review) => {
         const terms = filterText.toLowerCase().split(',');
@@ -115,6 +121,13 @@ const Reviews = ({ filterText, setFilterText }) => {
             const s = users.filter(user => review.relationships.subject.data.id.uuid === user.id.uuid);
             review.subject = s[0].attributes.profile.firstName + ' ' + s[0].attributes.profile.lastName;
             review.subjectId = s[0].id.uuid;
+
+            var k = [];
+            var j = <span className="fa fa-star checked"></span>;
+            for(var i = 0; i < review.attributes.rating; i++) {
+                k.push(j)
+            }
+            review.stars = k;
         })
 
         return reviews;
@@ -132,6 +145,7 @@ const Reviews = ({ filterText, setFilterText }) => {
                 dense
                 highlightOnHover
                 pointerOnHover
+                customStyles = { customStyles }
                 fixedHeader
                 fixedHeaderScrollHeight = '85vh'
                 noHeader

@@ -19,21 +19,32 @@ const Images = ({ filterText, setFilterText }) => {
         },
         {
             name: 'Name',
-            cell: row => { return(<a type="button" onClick={row.orgin==='User' ? clickUser : clickListing } rel={row.nameId}>{row.name}</a>) },
+            cell: row => { return(<a type='button' onClick={row.origin==='User' ? clickUser : clickListing } rel={row.nameId}>{row.name}</a>) },
             selector: 'name',
             sortable: true,
             compact: true,
         },   
         {
             name: 'Image',
-            cell: row => { return (<img className="img-size-50 mr-3 img-circle" src={ row.attributes.variants['square-small'].url } />) },
+            cell: row => { return (<img className='img-size-50 mr-3 img-circle' alt='image' src={ row.attributes.variants['square-small'].url } />) },
         },  
     ];
     const customStyles = {
         rows: {
-          style: {
-            minHeight: '70px', // override the row height
-          }
+            style: {
+                minHeight: '70px', // override the row height
+            }
+        },
+        headRow: {
+            style: {
+                minHeight: '32px',
+              
+            },
+        },
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
         },
     }
     
@@ -129,7 +140,7 @@ const Images = ({ filterText, setFilterText }) => {
                 data = { data.filter(image => filterImage(image)) }
                 keyField = 'id.uuid'
                 highlightOnHover
-                customStyles={ customStyles }
+                customStyles = { customStyles }
                 pointerOnHover
                 fixedHeader
                 fixedHeaderScrollHeight = "85vh"

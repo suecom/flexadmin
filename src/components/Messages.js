@@ -9,9 +9,7 @@ const Messages = ({ filterText, setFilterText }) => {
     const history = useHistory();
     const users = useSelector(state => state.users);
     const transactions = useSelector(state => state.transactions);
-    const reviews = useSelector(state => state.reviews);
     const messages = useSelector(state => state.messages);
-    const CompletedTransitions = ['transition/review-2-by-customer','transition/review-2-by-provider','transition/complete','transition/review-1-by-provider','transition/review-1-by-customer','transition/expire-customer-review-period','transition/expire-review-period'];
     const columns = [
         {
             name: 'Sent',
@@ -42,6 +40,13 @@ const Messages = ({ filterText, setFilterText }) => {
             compact: false,
         },  
     ];
+    const customStyles = {
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
+        },
+    }
     
     const filterMessage = (message) => {
         const terms = filterText.toLowerCase().split(',');
@@ -142,6 +147,7 @@ const Messages = ({ filterText, setFilterText }) => {
                 dense
                 highlightOnHover
                 pointerOnHover
+                customStyles = { customStyles }
                 fixedHeader
                 fixedHeaderScrollHeight = '85vh'
                 noHeader
