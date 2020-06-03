@@ -8,6 +8,10 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v0.4.0]
+
+Added reviews, messages, and images
+
 ## [v0.3.0]
 
 Added transactions to the expanded functional framework
