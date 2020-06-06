@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
@@ -10,25 +10,6 @@ const Images = ({ filterText, setFilterText }) => {
     const users = useSelector(state => state.users);
     const images = useSelector(state => state.images);
     const listings = useSelector(state => state.listings);
-    const columns = [
-        {
-            name: 'Type',
-            selector: 'origin',
-            sortable: true,
-            width: '95px',
-        },
-        {
-            name: 'Name',
-            cell: row => { return(<a type='button' onClick={row.origin==='User' ? clickUser : clickListing } rel={row.nameId}>{row.name}</a>) },
-            selector: 'name',
-            sortable: true,
-            compact: true,
-        },   
-        {
-            name: 'Image',
-            cell: row => { return (<img className='img-size-50 mr-3 img-circle' alt='help' src={ row.url } />) },
-        },  
-    ];
     const customStyles = {
         rows: {
             style: {
@@ -47,7 +28,47 @@ const Images = ({ filterText, setFilterText }) => {
             },
         },
     }
+
+    const clickUser = useCallback((e) =>  {
+        const user = users.filter(user => user.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/users?search=' + user[0].attributes.email);
+    }, [ users, filterText, history, location.pathname ])
+
+    const clickListing = useCallback((e) =>  {
+        const listing = listings.filter(listing => listing.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/listings?search=' + listing[0].id.uuid.substr(listing[0].id.uuid.lastIndexOf('-')+1,));
+    }, [ listings, history, filterText, location.pathname ])
     
+    const columns = useMemo(() => [
+        {
+            name: 'Type',
+            selector: 'origin',
+            sortable: true,
+            width: '95px',
+        },
+        {
+            name: 'Name',
+            cell: row => { return(<a type='button' href="!#" onClick={e => {e.preventDefault(); row.origin==='User' ? clickUser(e) : clickListing(e) }} rel={row.nameId}>{row.name}</a>) },
+            selector: 'name',
+            sortable: true,
+            compact: true,
+        },   
+        {
+            name: 'Image',
+            cell: row => { return (<img className='img-size-50 mr-3 img-circle' alt='help' src={ row.url } />) },
+        },  
+    ], [ clickUser, clickListing ])
+
     const filterImage = (image) => {
         const terms = filterText.toLowerCase().split(',');
         var retVal = terms.length === 0 || terms[0].length === 0 ? true : false;
@@ -61,26 +82,6 @@ const Images = ({ filterText, setFilterText }) => {
         return retVal;
     }
     
-    const clickUser = (e) =>  {
-        const user = users.filter(user => user.id.uuid === e.target.rel);
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/users?search=' + user[0].attributes.email);
-    }
-
-    const clickListing = (e) =>  {
-        const listing = listings.filter(listing => listing.id.uuid === e.target.rel);
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/listings?search=' + listing[0].id.uuid.substr(listing[0].id.uuid.lastIndexOf('-')+1,));
-    }
-
     useEffect(() => {
         var instance = new Mark("div.animated");
 
@@ -103,7 +104,7 @@ const Images = ({ filterText, setFilterText }) => {
         }
     })
 
-    const imagesPlus = () => {
+    const imagesPlus = useCallback(() => {
         images.forEach(image => {
             const user = users.filter(u => u.relationships !== undefined && u.relationships.profileImage !== undefined && u.relationships.profileImage.data !== undefined && u.relationships.profileImage.data !== null ? u.relationships.profileImage.data.id.uuid === image.id.uuid : false);
 
@@ -126,10 +127,10 @@ const Images = ({ filterText, setFilterText }) => {
                 })  
             }
 
-            if(image.attributes.variants['square-small'].url !== undefined) {
+            if(image.attributes.variants['square-small'] !== undefined) {
                 image.url = image.attributes.variants['square-small'].url;
             }
-            else if(image.attributes.variants['default'].url !== undefined) {
+            else if(image.attributes.variants['default'] !== undefined) {
                 image.url = image.attributes.variants['default'].url;
             }
             else {
@@ -138,9 +139,9 @@ const Images = ({ filterText, setFilterText }) => {
         })
 
         return images;
-    }
+    }, [ images, users, listings ])
 
-    const data = useMemo(() => imagesPlus(), [images, users, listings])
+    const data = useMemo(() => imagesPlus(), [ imagesPlus ])
 
     return (
         <div className="animated fadeIn">

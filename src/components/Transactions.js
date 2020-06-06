@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
@@ -15,9 +15,65 @@ const Transactions = ({ filterText, setFilterText }) => {
     const transactions = useSelector(state => state.transactions);
     const users = useSelector(state => state.users);
     const listings = useSelector(state => state.listings); 
-    const reviews = useSelector(state => state.reviews);
-    const messages = useSelector(state => state.messages);
-    const columns = [
+    const customStyles = {
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
+        },
+    }
+
+    const clickUser = useCallback((e) =>  {
+        const user = users.filter(user => user.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/users?search=' + user[0].attributes.email);
+    }, [ users, history, filterText, location.pathname ])
+
+    const clickListing = useCallback((e) => {
+        const listing = listings.filter(listing => listing.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/listings?search=' + listing[0].attributes.title);
+    }, [ listings, history, filterText, location.pathname ])
+
+    const clickMessages = useCallback((e) => {
+        var searchStr = '';
+        const trans = transactions.filter(transaction => transaction.id.uuid === e.target.value);
+        
+        for(const mess of trans[0].relationships.messages.data) {
+            searchStr = searchStr + mess.id.uuid.substr(mess.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
+
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/messages?search=' + searchStr);
+    }, [ transactions, history, filterText, location.pathname ])
+
+    const clickReviews = useCallback((e) => {
+        var searchStr = '';
+        const trans = transactions.filter(transaction => transaction.id.uuid === e.target.value);
+        
+        for(const rev of trans[0].relationships.reviews.data) {
+            searchStr = searchStr + rev.id.uuid.substr(rev.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/reviews?search=' + searchStr);
+    }, [ transactions, history, filterText, location.pathname ])
+
+    const columns = useMemo(() => [
         {
             name: 'On',
             format: row => new Date(row.attributes.lastTransitionedAt).toLocaleDateString(),
@@ -27,21 +83,21 @@ const Transactions = ({ filterText, setFilterText }) => {
         },
         {
             name: 'Provider',
-            cell: row => { return(<a type="button" onClick={clickUser} rel={row.providerId}>{row.provider}</a>) },
+            cell: row => { return(<a type="button" href="!#" onClick={e => {e.preventDefault(); clickUser(e);}} rel={row.providerId}>{row.provider}</a>) },
             selector: 'provider',
             sortable: true,
             compact: true,
         },
         {
             name: 'Customer',
-            cell: row => { return(<a type="button" onClick={clickUser} rel={row.customerId}>{row.customer}</a>) },
+            cell: row => { return(<a type="button" href="!#" onClick={e => {e.preventDefault(); clickUser(e);}} rel={row.customerId}>{row.customer}</a>) },
             selector: 'customer',
             sortable: true,
             compact: true,
         },   
         {
             name: 'Regards',
-            cell: row => { return(<a type="button" onClick={clickListing} rel={row.listingId}>{row.listing}</a>) },
+            cell: row => { return(<a type="button" href="#!" onClick={e => {e.preventDefault(); clickListing(e);}} rel={row.listingId}>{row.listing}</a>) },
             selector: 'listing',
             sortable: true,
             compact: true,
@@ -72,14 +128,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
-    ];
-    const customStyles = {
-        headCells: {
-            style: {
-                fontWeight: 'bold',
-            },
-        },
-    }
+    ], [ clickReviews, clickMessages, clickListing, clickUser ])
     
     const filterTransaction = (transaction) => {
         const terms = filterText.toLowerCase().split(',');
@@ -95,56 +144,6 @@ const Transactions = ({ filterText, setFilterText }) => {
         }
 
         return retVal;
-    }
-
-    const clickUser = (e) =>  {
-        const user = users.filter(user => user.id.uuid === e.target.rel);
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/users?search=' + user[0].attributes.email);
-    }
-
-    const clickListing = (e) => {
-        const listing = listings.filter(listing => listing.id.uuid === e.target.rel);
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/listings?search=' + listing[0].attributes.title);
-    }
-
-    const clickMessages = (e) => {
-        var searchStr = '';
-        const trans = transactions.filter(transaction => transaction.id.uuid === e.target.value);
-        
-        for(const mess of trans[0].relationships.messages.data) {
-            searchStr = searchStr + mess.id.uuid.substr(mess.id.uuid.lastIndexOf('-')+1,) + ',';
-        }
-
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/messages?search=' + searchStr);
-    }
-
-    const clickReviews = (e) => {
-        var searchStr = '';
-        const trans = transactions.filter(transaction => transaction.id.uuid === e.target.value);
-        
-        for(const rev of trans[0].relationships.reviews.data) {
-            searchStr = searchStr + rev.id.uuid.substr(rev.id.uuid.lastIndexOf('-')+1,) + ',';
-        }
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/reviews?search=' + searchStr);
     }
 
     useEffect(() => {
@@ -169,7 +168,7 @@ const Transactions = ({ filterText, setFilterText }) => {
         }
     });
 
-    const transactionsPlus = () => {
+    const transactionsPlus = useCallback(() => {
         transactions.forEach(transaction => {
             const p = users.filter(user => transaction.relationships.provider.data.id.uuid === user.id.uuid);
 
@@ -216,9 +215,9 @@ const Transactions = ({ filterText, setFilterText }) => {
         })
 
         return transactions;
-    };
+    }, [ transactions, listings, users ]);
 
-    const data = useMemo(() => transactionsPlus(), [transactions, listings, users, messages, reviews])
+    const data = useMemo(() => transactionsPlus(), [ transactionsPlus ])
 
     return (
         <div className="animated fadeIn">

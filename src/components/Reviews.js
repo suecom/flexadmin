@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
@@ -9,7 +9,25 @@ const Reviews = ({ filterText, setFilterText }) => {
     const history = useHistory();
     const users = useSelector(state => state.users);
     const reviews = useSelector(state => state.reviews);
-    const columns = [
+    const customStyles = {
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
+        }
+    };
+
+    const clickUser = useCallback((e) => {
+        const user = users.filter(user => user.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/users?search=' + user[0].attributes.email);
+    }, [ users, history, filterText, location.pathname ]);
+
+    const columns = useMemo(() => [
         {
             name: 'Sent',
             format: row => new Date(row.attributes.createdAt).toLocaleDateString(),
@@ -19,7 +37,7 @@ const Reviews = ({ filterText, setFilterText }) => {
         }, 
         {
             name: 'By',
-            cell: row => { return(<a type="button" onClick={clickAuthor} rel={row.authorId}>{row.author}</a>) },
+            cell: row => { return(<a type="button" href="!#" onClick={e => {e.preventDefault(); clickUser(e);}} rel={row.authorId}>{row.author}</a>) },
             selector: 'owner',
             sortable: true,
             compact: true,
@@ -27,7 +45,7 @@ const Reviews = ({ filterText, setFilterText }) => {
         },
         {
             name: 'For',
-            cell: row => { return(<a type="button" onClick={clickSubject} rel={row.subjectId}>{row.subject}</a>) },
+            cell: row => { return(<a type="button" href="!#" onClick={e => {e.preventDefault(); clickUser(e);}} rel={row.subjectId}>{row.subject}</a>) },
             selector: 'subject',
             sortable: true,
             compact: true,
@@ -48,14 +66,7 @@ const Reviews = ({ filterText, setFilterText }) => {
             sortable: true,
             compact: false,
         },  
-    ];
-    const customStyles = {
-        headCells: {
-            style: {
-                fontWeight: 'bold',
-            },
-        }
-    };
+    ], [ clickUser ]);
     
     const filterReview = (review) => {
         const terms = filterText.toLowerCase().split(',');
@@ -71,27 +82,7 @@ const Reviews = ({ filterText, setFilterText }) => {
 
         return retVal;
     }
-
-    const clickAuthor = (e) => {
-        const user = users.filter(user => user.id.uuid === e.target.rel);
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/users?search=' + user[0].attributes.email);
-    }
-
-    const clickSubject = (e) => {
-        const user = users.filter(user => user.id.uuid === e.target.rel);
-    
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/users?search=' + user[0].attributes.email);
-    }
-    
+      
     useEffect(() => {
         var instance = new Mark("div.animated");
 
@@ -114,7 +105,7 @@ const Reviews = ({ filterText, setFilterText }) => {
         }
     })
 
-    const reviewsPlus = () => {
+    const reviewsPlus = useCallback(() => {
         reviews.forEach(review => {
             const a = users.filter(user => review.relationships.author.data.id.uuid === user.id.uuid);
 
@@ -142,9 +133,9 @@ const Reviews = ({ filterText, setFilterText }) => {
         })
 
         return reviews;
-    }
+    }, [ reviews, users ])
 
-    const data = useMemo(() => reviewsPlus(), [users, reviews])
+    const data = useMemo(() => reviewsPlus(), [ reviewsPlus ])
 
     return (
         <div className="animated fadeIn">

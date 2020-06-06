@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
+
+import JSONEditor from './Editor.js';
 
 const Listings = ({ filterText, setFilterText }) => {
     const location = useLocation();
@@ -13,7 +15,76 @@ const Listings = ({ filterText, setFilterText }) => {
     const reviews = useSelector(state => state.reviews);
     const CompletedTransitions = ['transition/review-2-by-customer','transition/review-2-by-provider','transition/complete','transition/review-1-by-provider','transition/review-1-by-customer','transition/expire-customer-review-period','transition/expire-review-period'];
     const EnquiryTransitions = ['transition/request-payment','transition/request-payment-after-enquiry','transition/expire-payment','transition/decline','transition/expire'];
-    const columns = [
+    const customStyles = {
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
+        }
+    };
+
+    const clickReviews = useCallback((e) => {
+        var searchStr = '';
+        const listing = listings.filter(listing => listing.id.uuid === e.target.value);
+        const revs = reviews.filter(review => review.relationships.listing.data.id.uuid === listing[0].id.uuid &&
+                                                    review.relationships.subject.data.id.uuid === listing[0].relationships.author.data.id.uuid);
+        
+        for(const rev of revs) {
+            searchStr = searchStr + rev.id.uuid.substr(rev.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/reviews?search=' + searchStr);
+    }, [ listings, reviews, filterText, history, location.pathname ])
+
+    const clickEnquiries = useCallback((e) => {
+        var searchStr = '';
+        const listing = listings.filter(listing => listing.id.uuid === e.target.value);
+        const enquiries = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing[0].id.uuid &&
+                                                            EnquiryTransitions.includes(transaction.attributes.lastTransition));
+        
+        for(const enq of enquiries) {
+            searchStr = searchStr + enq.id.uuid.substr(enq.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
+
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/transactions?search=' + searchStr);
+    }, [ listings, transactions, EnquiryTransitions, filterText, history, location.pathname ])
+
+    const clickRented = useCallback((e) => {
+        var searchStr = '';
+        const listing = listings.filter(listing => listing.id.uuid === e.target.value);
+        const enquiries = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing[0].id.uuid &&
+                                                            CompletedTransitions.includes(transaction.attributes.lastTransition));
+        
+        for(const enq of enquiries) {
+            searchStr = searchStr + enq.id.uuid.substr(enq.id.uuid.lastIndexOf('-')+1,) + ',';
+        }
+
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/transactions?search=' + searchStr);
+    }, [ listings, transactions, CompletedTransitions, history, filterText, location.pathname ])
+
+    const clickUser = useCallback((e) => {
+        const user = users.filter(user => user.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/users?search=' + user[0].attributes.email);
+    }, [ users, history, filterText, location.pathname ])
+
+    const columns = useMemo(() => [
         {
             name: 'Posted',
             format: row => new Date(row.attributes.createdAt).toLocaleDateString(),
@@ -23,7 +94,7 @@ const Listings = ({ filterText, setFilterText }) => {
         },
         {
             name: 'Owner',
-            cell: row => { return(<a type="button" onClick={clickOwner} rel={row.ownerId}>{row.owner}</a>) },
+            cell: row => { return(<a type="button" href="!#" onClick={e => {e.preventDefault(); clickUser(e);}} rel={row.ownerId}>{row.owner}</a>) },
             selector: 'owner',
             sortable: true,
             compact: true,
@@ -78,15 +149,8 @@ const Listings = ({ filterText, setFilterText }) => {
             cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
-    ];
-    const customStyles = {
-        headCells: {
-            style: {
-                fontWeight: 'bold',
-            },
-        }
-    };
-
+    ], [ clickUser, clickReviews, clickRented, clickEnquiries ]);
+    
     const filterListing = (listing) => {
         const terms = filterText.toLowerCase().split(',');
         var retVal = terms.length === 0 || terms[0].length === 0 ? true : false;
@@ -101,67 +165,6 @@ const Listings = ({ filterText, setFilterText }) => {
         }
 
         return retVal;
-    }
-
-    const clickReviews = (e) => {
-        var searchStr = '';
-        const listing = listings.filter(listing => listing.id.uuid === e.target.value);
-        const revs = reviews.filter(review => review.relationships.listing.data.id.uuid === listing[0].id.uuid &&
-                                                    review.relationships.subject.data.id.uuid === listing[0].relationships.author.data.id.uuid);
-        
-        for(const rev of revs) {
-            searchStr = searchStr + rev.id.uuid.substr(rev.id.uuid.lastIndexOf('-')+1,) + ',';
-        }
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/reviews?search=' + searchStr);
-    }
-
-    const clickEnquiries = (e) => {
-        var searchStr = '';
-        const listing = listings.filter(listing => listing.id.uuid === e.target.value);
-        const enquiries = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing[0].id.uuid &&
-                                                            EnquiryTransitions.includes(transaction.attributes.lastTransition));
-        
-        for(const enq of enquiries) {
-            searchStr = searchStr + enq.id.uuid.substr(enq.id.uuid.lastIndexOf('-')+1,) + ',';
-        }
-
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/transactions?search=' + searchStr);
-    }
-
-    const clickRented = (e) => {
-        var searchStr = '';
-        const listing = listings.filter(listing => listing.id.uuid === e.target.value);
-        const enquiries = transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing[0].id.uuid &&
-                                                            CompletedTransitions.includes(transaction.attributes.lastTransition));
-        
-        for(const enq of enquiries) {
-            searchStr = searchStr + enq.id.uuid.substr(enq.id.uuid.lastIndexOf('-')+1,) + ',';
-        }
-
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/transactions?search=' + searchStr);
-    }
-
-    const clickOwner = (e) => {
-        const user = users.filter(user => user.id.uuid === e.target.rel);
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/users?search=' + user[0].attributes.email);
     }
     
     useEffect(() => {
@@ -186,7 +189,7 @@ const Listings = ({ filterText, setFilterText }) => {
         }
     }) 
 
-    const listingsPlus = () => {
+    const listingsPlus = useCallback(() => {
         listings.forEach(listing => {
             const u = users.filter(user => listing.relationships.author.data.id.uuid === user.id.uuid);
             
@@ -214,9 +217,9 @@ const Listings = ({ filterText, setFilterText }) => {
         })
 
         return listings;
-    }
+    }, [ users, listings, transactions, reviews, CompletedTransitions, EnquiryTransitions ])
 
-    const data = useMemo(() => listingsPlus(), [listings, users, transactions, reviews]);
+    const data = useMemo(() => listingsPlus(), [ listingsPlus ]);
 
     return (
         <div className="animated fadeIn">
@@ -233,7 +236,9 @@ const Listings = ({ filterText, setFilterText }) => {
                 fixedHeaderScrollHeight = '85vh'
                 noHeader 
                 defaultSortField = 'attributes.createdAt' 
-                defaultSortAsc = { false }             
+                defaultSortAsc = { false }      
+                expandableRows
+                expandableRowsComponent={<JSONEditor />}         
             />
         </div>
     )

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
@@ -10,7 +10,25 @@ const Messages = ({ filterText, setFilterText }) => {
     const users = useSelector(state => state.users);
     const transactions = useSelector(state => state.transactions);
     const messages = useSelector(state => state.messages);
-    const columns = [
+    const customStyles = {
+        headCells: {
+            style: {
+                fontWeight: 'bold',
+            },
+        },
+    }
+
+    const clickUser = useCallback((e) => {
+        const user = users.filter(user => user.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/users?search=' + user[0].attributes.email);
+    }, [ users, history, filterText, location.pathname ])
+    
+    const columns = useMemo(() => [
         {
             name: 'Sent',
             format: row => new Date(row.attributes.createdAt).toLocaleDateString(),
@@ -20,7 +38,7 @@ const Messages = ({ filterText, setFilterText }) => {
         }, 
         {
             name: 'From',
-            cell: row => { return(<a type="button" onClick={clickAuthor} rel={row.authorId}>{row.author}</a>) },
+            cell: row => { return(<a type="button" href="!#" onClick={e => {e.preventDefault(); clickUser(e);}} rel={row.authorId}>{row.author}</a>) },
             selector: 'author',
             sortable: true,
             compact: true,
@@ -28,7 +46,7 @@ const Messages = ({ filterText, setFilterText }) => {
         },
         {
             name: 'To',
-            cell: row => { return(<a type="button" onClick={clickSubject} rel={row.subjectId}>{row.subject}</a>) },
+            cell: row => { return(<a type="button" href="#!" onClick={e => {e.preventDefault(); clickUser(e);}} rel={row.subjectId}>{row.subject}</a>) },
             selector: 'subject',
             sortable: true,
             compact: true,
@@ -39,14 +57,7 @@ const Messages = ({ filterText, setFilterText }) => {
             selector: 'attributes.content',
             compact: false,
         },  
-    ];
-    const customStyles = {
-        headCells: {
-            style: {
-                fontWeight: 'bold',
-            },
-        },
-    }
+    ], [ clickUser ])
     
     const filterMessage = (message) => {
         const terms = filterText.toLowerCase().split(',');
@@ -63,26 +74,6 @@ const Messages = ({ filterText, setFilterText }) => {
         return retVal;
     }
 
-    const clickAuthor = (e) => {
-        const user = users.filter(user => user.id.uuid === e.target.rel);
-        
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/users?search=' + user[0].attributes.email);
-    }
-
-    const clickSubject = (e) => {
-        const user = users.filter(user => user.id.uuid === e.target.rel);
-    
-        // This set the state for this location
-        history.replace(location.pathname, { filterText: filterText });
-
-        // This then redirects using the query to update filterText
-        history.push('/users?search=' + user[0].attributes.email);
-    }
-    
     useEffect(() => {
         var instance = new Mark("div.animated");
 
@@ -105,7 +96,7 @@ const Messages = ({ filterText, setFilterText }) => {
         }
     })
 
-    const messagesPlus = () => {
+    const messagesPlus = useCallback(() => {
         messages.forEach(message => {
             const a = users.filter(user => message.relationships.sender.data.id.uuid === user.id.uuid);
 
@@ -120,7 +111,6 @@ const Messages = ({ filterText, setFilterText }) => {
                 message.authorEmail = '';
             }
             
-
             // For all the transactions
             for(const tran of transactions) {
                 // Search through all the messages for this one....
@@ -152,9 +142,9 @@ const Messages = ({ filterText, setFilterText }) => {
         })
 
         return messages;
-    }
+    }, [ messages, users, transactions ])
 
-    const data = useMemo(() => messagesPlus(), [users, transactions, messages])
+    const data = useMemo(() => messagesPlus(), [ messagesPlus ])
 
     return (
         <div className="animated fadeIn">
