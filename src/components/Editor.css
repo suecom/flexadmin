@@ -1,0 +1,16 @@
+
+
+div.jsoneditor td, div.jsoneditor-field, div.jsoneditor-value {
+    font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    line-height: 100%;
+    font-size: 10pt;
+    
+}
+
+.jsoneditor-menu {
+    background-color: #28A745
+}
+
+.jsoneditor-is-not-default {
+    font-weight: bold;
+}

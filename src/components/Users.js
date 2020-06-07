@@ -209,7 +209,10 @@ const Users = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }
                 expandableRows
-                expandableRowsComponent={<JSONEditor />}  
+                expandableRowsComponent={<JSONEditor schema={'user'} />}  
+                //expandableRowsHideExpander
+                expandOnRowClicked
+                //expandableIcon = {{ 'collapsed':  <svg><path d='../../logo.svg'/></svg>, 'expanded': <svg><path d='../../logo.svg'/></svg> }}
             />
         </div>
     )
