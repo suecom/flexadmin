@@ -238,7 +238,7 @@ const Listings = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }      
                 expandableRows
-                expandableRowsComponent={<JSONEditor />}         
+                expandableRowsComponent={<JSONEditor schema={'listing'} />}         
             />
         </div>
     )
