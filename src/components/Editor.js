@@ -1,6 +1,7 @@
-import React from 'react';
-import { JsonEditor as Editor } from '../jsoneditor-react';
-import Ajv from 'ajv';
+import React, { useState, useEffect, useCallback } from 'react';
+import JSONEditor from 'jsoneditor';
+import 'jsoneditor/dist/jsoneditor.css';
+//import Ajv from 'ajv';
 
 import './Editor.css';
 
@@ -46,12 +47,12 @@ const user = {
                             }
                         },
                         'protectedData': {
-                            'type': 'object',
+                            'type': ['object','null'],
                             'properties': {
                             }
                         },
                         'privateData': {
-                            'type': 'object',
+                            'type': ['object','null'],
                             'properties': {
                             }
                         },
@@ -61,11 +62,11 @@ const user = {
                             }
                         },
                     },
-                    'required': [ 'displayName', 'firstName', 'lastName', 'abbreviatedName', 'bio', 'publicData', 'protectedData', 'privateData', 'metadata' ],
+                    'required': [ 'displayName', 'firstName', 'lastName', 'abbreviatedName', 'bio' ],
                     'additionalProperties': false,
                 }              
             },
-            'required': [ 'createdAt', 'email', 'banned', 'deleted', 'emailVerified', 'stripeConnected', 'profile', 'pendingEmail' ],
+            'required': [ 'createdAt', 'email', 'banned', 'deleted', 'emailVerified', 'profile' ],
             'additionalProperties': false,
         },
         'relationships' :{
@@ -113,10 +114,8 @@ const listing = {
                 'deleted': { 'type': 'boolean' },
                 'state': { 'type': 'string' },
                 'createdAt': {
-                    'type': 'object',
-                    'properties': {
-
-                    }
+                    'type': 'string',
+                    
                 },
                 'geolocation': {
                     'type': 'object',
@@ -149,14 +148,18 @@ const listing = {
                     'properties': {
                     }
                 },
+                'protectedData': {
+                    'type': 'object',
+                    'properties': {
+                    }
+                },
                 'metadata': {
                     'type': 'object',
                     'properties': {
                     }
                 }           
             },
-            'required': [ 'title', 'description', 'deleted', 'state', 'createdAt', 'geolocation', 'availabilityPlan', 'price', 'publicData', 'privateData', 'metadata' ],
-            'additionalProperties': false
+            'required': [ 'title', 'description', 'deleted', 'state', 'createdAt', 'geolocation', 'availabilityPlan', 'price', 'publicData' ],
         },
         'relationships' : {
             'readonly': true,
@@ -183,14 +186,18 @@ const listing = {
     'additionalProperties': false
 }
 
-const JSONEditor = ( { data, schema } ) => {
-    const ajv = new Ajv({ allErrors: true, verbose: true });
+const Editor = ( { data, validSchema } ) => {
+    const [ container, setContainer ] = useState(null);
+    const [ jsonEditor, setEditor ] = useState(null);
+    const [ json ] = useState(data);
+    const [ schema ] = useState(validSchema)
+    //const ajv = new Ajv({ allErrors: true, verbose: true });
     const schemas = {
         'user': user,
         'listing': listing,
     }
 
-    const onEditable = (node) => {
+    const onEditable = useCallback((node) => {
         switch (node.field) {
             case 'id':
             case 'type':
@@ -238,39 +245,57 @@ const JSONEditor = ( { data, schema } ) => {
             default:
                 return true
         }
+    }, [])
+
+    const onTimeTag = ({ field, value, path }) => {
+        console.log(value)
     }
 
-    const newJSON = (json) => {
-        console.log(json)
+    const onTimeFormat = ({ field, value, path }) => {
+        console.log(value)
     }
 
-    // Remove working values from editor
-    var newdata = Object.assign({}, data, {});
-    delete newdata['listings']
-    delete newdata['clients']
-    delete newdata['rentals']
-    delete newdata['reviews']
-    delete newdata['enquires']
-    delete newdata['owner']
-    delete newdata['ownerId']
-    delete newdata['ownerEmail']
+    useEffect((props) => {
+        if(jsonEditor === null && container !== null) {
+            const options = {
+                mode: 'tree',
+                modes: [ 'code', 'view', 'tree' ],
+                schema: schemas[schema],
+                onEditable: onEditable,
+                name: schema,
+                history: true,
+                navigationBar: false,
+                enableTransform: false,
+                statusBar: false,
+                timestampTag: onTimeTag,
+                timestampFormat: onTimeFormat,
+            }
+    
+            setEditor(new JSONEditor(container, options))
+        }
 
+        if(jsonEditor !== null) {
+            var newData = Object.assign({}, json, {});
+
+            delete newData['_id']
+            delete newData['listings']
+            delete newData['clients']
+            delete newData['rentals']
+            delete newData['reviews']
+            delete newData['enquires']
+            delete newData['owner']
+            delete newData['ownerId']
+            delete newData['ownerEmail']
+
+            jsonEditor.update(newData)
+        }
+
+        return (() => jsonEditor !== null ? jsonEditor.destroy() : null )
+    }, [ schema, schemas, json, container, jsonEditor, onEditable ])
+    
     return (
-        <Editor 
-            name = { schema }
-            allowedModes = { [ 'code', 'view', 'tree' ] }
-            mode = 'tree'
-            history = { true }
-            value = { newdata }
-            ajv = { ajv }
-            schema = { schemas[schema] }
-            onEditable = { onEditable }
-            onChange = { newJSON }
-            navigationBar = { false }
-            enableTransform = { false }
-            statusBar = { false }
-        />
+        <div className="jsoneditor-react-container" ref={ elem => setContainer(elem) } />
     );
 }
 
-export default JSONEditor; 
+export default Editor; 

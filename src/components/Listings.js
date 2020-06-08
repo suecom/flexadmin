@@ -4,7 +4,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
 
-import JSONEditor from './Editor.js';
+import Editor from './Editor.js';
 
 const Listings = ({ filterText, setFilterText }) => {
     const location = useLocation();
@@ -238,7 +238,7 @@ const Listings = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }      
                 expandableRows
-                expandableRowsComponent={<JSONEditor schema={'listing'} />}         
+                expandableRowsComponent={<Editor validSchema={'listing'} />}         
             />
         </div>
     )

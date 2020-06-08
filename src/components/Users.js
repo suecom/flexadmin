@@ -4,7 +4,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
 
-import JSONEditor from './Editor.js';
+import Editor from './Editor.js';
 
 const Users = ({ filterText, setFilterText }) => {
     const location = useLocation();
@@ -191,7 +191,7 @@ const Users = ({ filterText, setFilterText }) => {
     }, [ users, listings, transactions, reviews, CompletedTransitions ])
 
     const data = useMemo(() => usersPlus(), [ usersPlus ])
-
+console.log(data)
     return (
         <div className="animated fadeIn">
             <DataTable
@@ -209,8 +209,7 @@ const Users = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }
                 expandableRows
-                expandableRowsComponent={<JSONEditor schema={'user'} />}  
-                //expandableRowsHideExpander
+                expandableRowsComponent={<Editor validSchema={'user'} />}  
                 expandOnRowClicked
                 //expandableIcon = {{ 'collapsed':  <svg><path d='../../logo.svg'/></svg>, 'expanded': <svg><path d='../../logo.svg'/></svg> }}
             />
