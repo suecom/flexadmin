@@ -191,7 +191,7 @@ const Users = ({ filterText, setFilterText }) => {
     }, [ users, listings, transactions, reviews, CompletedTransitions ])
 
     const data = useMemo(() => usersPlus(), [ usersPlus ])
-console.log(data)
+
     return (
         <div className="animated fadeIn">
             <DataTable

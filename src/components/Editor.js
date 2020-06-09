@@ -1,9 +1,120 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { Component } from 'react';
 import JSONEditor from 'jsoneditor';
 import 'jsoneditor/dist/jsoneditor.css';
-//import Ajv from 'ajv';
+
+import listingApi from '../api/listingApi';
+import userApi from '../api/userApi';
 
 import './Editor.css';
+
+const diff = (obj1, obj2) => {
+    const result = {};
+
+    if (Object.is(obj1, obj2)) {
+   			return undefined;
+    }
+
+    if (!obj2 || typeof obj2 !== 'object') {
+    		return obj2;
+    }
+
+    Object.keys(obj1 || {}).concat(Object.keys(obj2 || {})).forEach(key => {
+        if(obj2[key] !== obj1[key] && !Object.is(obj1[key], obj2[key])) {
+		    result[key] = obj2[key];
+        }
+
+        if(typeof obj2[key] === 'object' && typeof obj1[key] === 'object') {
+        	const value = diff(obj1[key], obj2[key]);
+            
+            if (value !== undefined) {
+            	result[key] = value;
+            }
+        }
+    });
+
+    return result;
+}
+
+const hasValues = (obj) => {
+    var RV = false;
+
+    for(const k in obj) {
+        // Ignore prototypes...
+        if(!obj.hasOwnProperty(k)) continue;
+
+        if(typeof obj[k] === 'object') {
+            RV = RV | hasValues(obj[k])
+        }
+        else {
+            RV = true;
+        }
+    }
+
+    return RV;
+}
+
+const createUpdates = (obj) => {
+    var res = [];
+  
+	for(const key in obj) {
+  		var o = {};  
+        
+  		// Ignore prototypes...
+        if(!obj.hasOwnProperty(key)) continue;
+        
+        switch(key) {
+            case 'attributes':
+            case 'banned':
+            case 'deleted':
+            case 'emailVerified':       
+            case 'profile':
+            case 'firstName':
+            case 'lastName':
+            case 'displayName':
+            case 'bio':
+            case 'title':
+            case 'description':
+            case 'price':
+            case 'amount':
+            case 'state':
+            case 'publicData':
+            case 'privateData':
+            case 'protectedData':
+            case 'metadata':
+                if(typeof obj[key] === 'object') {
+                    if(hasValues(obj[key])) {
+                        o[key] = obj[key]
+                        res.push(o);
+                    }
+                }
+                else {
+          			o[key] = obj[key]
+                    res.push(o);
+                }		
+                break;
+            default:
+        }    
+    }
+
+    return res;
+}
+
+const getJson = (json) => {
+    var newData = JSON.parse(JSON.stringify(json));
+
+    delete newData['_id'];
+    delete newData['listings'];
+    delete newData['clients'];
+    delete newData['rentals'];
+    delete newData['reviews'];
+    delete newData['enquires'];
+    delete newData['owner'];
+    delete newData['ownerId'];
+    delete newData['ownerEmail'];
+    newData.attributes.createdAt = (json.attributes.createdAt instanceof Object) ? json.attributes.createdAt.toLocaleDateString() + ' ' + json.attributes.createdAt.toLocaleTimeString() : json.attributes.createdAt;
+
+    return newData;
+}
 
 const user = {
     'title': 'User',
@@ -27,12 +138,7 @@ const user = {
                 'stripeConnected': { 'type': 'boolean' },
                 'pendingEmail': { 'type': [ 'null', 'string' ] },
                 'email': { 'type': 'string', 'format': 'email' },
-                'createdAt': {
-                    'type': 'object',
-                    'properties': {
-
-                    }
-                },
+                'createdAt': { 'type': 'string' },
                 'profile': {
                     'type': 'object',
                     'properties': {
@@ -77,13 +183,25 @@ const user = {
                     'readonly': true,
                     'type': 'object',
                     'properties': {
-                    }
+                        'data' : { 'type': [ 'null', 'object'] }
+                    },
+                    'additionalProperties': false,
                 },
                 'stripeAccount': {
                     'readonly': true,
                     'type': 'object',
                     'properties': {
-                    }
+                        'data' : { 'type': [ 'null', 'object'] }
+                    },
+                    'additionalProperties': false,
+                },
+                'stripeCustomer': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': [ 'null', 'object'] }
+                    },
+                    'additionalProperties': false,
                 }
             },
             'additionalProperties': false,
@@ -113,10 +231,7 @@ const listing = {
                 'description': { 'type': 'string' },
                 'deleted': { 'type': 'boolean' },
                 'state': { 'type': 'string' },
-                'createdAt': {
-                    'type': 'string',
-                    
-                },
+                'createdAt': { 'type': 'string' },
                 'geolocation': {
                     'type': 'object',
                     'properties': {
@@ -169,14 +284,18 @@ const listing = {
                     'readonly': true,
                     'type': 'object',
                     'properties': {
-                    }
+                        'data' : { 'type': [ 'null', 'object'] }
+                    },
+                    'additionalProperties': false,
                 },
                 'images': {
                     'readonly': true,
                     'type': 'object',
                     'properties': {
+                        'data' : { 'type': [ 'null', 'array'] }
                     }
-                }
+                },
+                'additionalProperties': false,
             },
             'required': [ 'author', 'images' ],
             'additionalProperties': false     
@@ -186,18 +305,25 @@ const listing = {
     'additionalProperties': false
 }
 
-const Editor = ( { data, validSchema } ) => {
-    const [ container, setContainer ] = useState(null);
-    const [ jsonEditor, setEditor ] = useState(null);
-    const [ json ] = useState(data);
-    const [ schema ] = useState(validSchema)
-    //const ajv = new Ajv({ allErrors: true, verbose: true });
-    const schemas = {
-        'user': user,
-        'listing': listing,
-    }
+class Editor extends Component {
+    constructor(props) {
+        super(props);
 
-    const onEditable = useCallback((node) => {
+        this.state = {
+            container: null,
+            json: props.data,
+            schema: props.validSchema,
+            editor: null,
+            button: null,
+            errors: 0,
+        }
+
+        this.onSave = this.onSave.bind(this);
+        this.onValidationError = this.onValidationError.bind(this);
+        this.onChange = this.onChange.bind(this);
+    };
+    
+    onEditable = (node) => {
         switch (node.field) {
             case 'id':
             case 'type':
@@ -207,37 +333,38 @@ const Editor = ( { data, validSchema } ) => {
             case 'stripeAccount':
             case 'relationships':
             case 'stripeConnected':
+            case 'stripeCustomer':
             case 'data':
             case 'availabilityPlan':
             case 'currency':
             case 'author':
             case 'images':
+            case 'email':
+            case 'createdAt':
+            case 'geolocation':
+            case 'abbreviatedName':
+            case 'lat':
+            case 'lng':
+            case 'pendingEmail':
                 return false
             case 'attributes':
             case 'banned':
             case 'deleted':
-            case 'createdAt':
-            case 'email':
-            case 'emailVerified':
-            case 'pendingEmail':
+            case 'emailVerified':       
             case 'profile':
             case 'firstName':
             case 'lastName':
-            case 'abbreviatedName':
             case 'displayName':
             case 'bio':
+            case 'title':
+            case 'description':
+            case 'price':
+            case 'amount':
+            case 'state':
             case 'publicData':
             case 'privateData':
             case 'protectedData':
             case 'metadata':
-            case 'title':
-            case 'description':
-            case 'geolocation':
-            case 'price':
-            case 'lat':
-            case 'lng':
-            case 'amount':
-            case 'state':
                 return {
                     field: false,
                     value: true
@@ -245,57 +372,150 @@ const Editor = ( { data, validSchema } ) => {
             default:
                 return true
         }
-    }, [])
-
-    const onTimeTag = ({ field, value, path }) => {
-        console.log(value)
     }
 
-    const onTimeFormat = ({ field, value, path }) => {
-        console.log(value)
+    onSave = (uuid, type) => {
+        var api;
+        const o1 = JSON.parse(JSON.stringify(getJson(this.state.json)));
+        const o2 = this.state.editor.get();
+
+        const obj = diff(o1, o2);
+        const updates = createUpdates(obj.attributes);
+
+        switch(type) {
+            case 'listing':
+                api = new listingApi();
+                api.updateListing(uuid, updates).then(res => {
+                    alert("Update succeeded");
+                })
+                .catch(error => {
+                    alert("update FAILED");
+                })
+                break;
+            case 'user':
+                api = new userApi();
+                api.updateUser(uuid, updates).then(res => {
+                    alert("Update succeeded");
+                })
+                .catch(error => {
+                    alert("update FAILED");
+                })
+                break;
+            default:
+                break;
+        }
+
+        console.log(updates)
     }
 
-    useEffect((props) => {
-        if(jsonEditor === null && container !== null) {
+    onValidationError = (errors) => {
+        var button = this.state.button;
+
+        this.setState({ errors: errors.length } );
+        if(errors.length > 0) {
+            button.disabled = true;
+        }
+        else {
+            const s1 = JSON.stringify(getJson(this.state.json));
+            const s2 = JSON.stringify(this.state.editor.get());
+        
+            if(s1 !== s2) {
+                button.disabled = false;
+            }
+        }
+    }
+
+    onChange = () => {
+        var button = this.state.button;
+        const s1 = JSON.stringify(getJson(this.state.json));
+        const s2 = JSON.stringify(this.state.editor.get());
+
+        if(s1 !== s2 && this.state.errors === 0) {
+            button.disabled = false;
+        }
+        else {
+            button.disabled = true;
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        // Editor not instantiated
+        if(nextState.container !== null && nextState.editor === null) {
+            return true;
+        }
+        
+        // Json changed
+        if(nextState.json !== this.state.json) {
+            return true;
+        }
+
+        return false;
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        var editor = this.state.editor;
+
+        if(this.state.container !== null && this.state.editor == null) {
+            const schemas = {
+                'user': user,
+                'listing': listing,
+            };
             const options = {
                 mode: 'tree',
-                modes: [ 'code', 'view', 'tree' ],
-                schema: schemas[schema],
-                onEditable: onEditable,
-                name: schema,
+                schema: schemas[this.state.schema],
+                onEditable: this.onEditable,
+                onChange: this.onChange,
+                onValidationError: this.onValidationError,
+                name: this.state.schema,
                 history: true,
                 navigationBar: false,
+                enableSort: false,
                 enableTransform: false,
                 statusBar: false,
-                timestampTag: onTimeTag,
-                timestampFormat: onTimeFormat,
+            };
+
+            editor = new JSONEditor(this.state.container, options)
+            this.setState({ editor: editor });   
+        }
+
+        if(this.state.button === null && this.state.container !== null && 
+                this.state.container.getElementsByClassName("jsoneditor-menu").length > 0) {
+            const but = document.createElement('button');
+            but.type = 'button';
+            but.className = 'jsoneditor-modes jsoneditor-separator';
+            but.innerHTML = 'Save';
+            but.title = 'Save';
+            but.disabled = true;
+            but.onclick = (e) => {
+                this.onSave(this.state.json.id.uuid, this.state.json.type);
             }
-    
-            setEditor(new JSONEditor(container, options))
+            this.setState({ button: but })
+
+            const frame = document.createElement('div');
+            frame.className = 'jsoneditor-modes';
+            frame.style.position = 'relative';
+            frame.appendChild(but);
+        
+            var menu = this.state.container.getElementsByClassName("jsoneditor-menu")[0];
+            menu.appendChild(frame);
         }
 
-        if(jsonEditor !== null) {
-            var newData = Object.assign({}, json, {});
-
-            delete newData['_id']
-            delete newData['listings']
-            delete newData['clients']
-            delete newData['rentals']
-            delete newData['reviews']
-            delete newData['enquires']
-            delete newData['owner']
-            delete newData['ownerId']
-            delete newData['ownerEmail']
-
-            jsonEditor.update(newData)
+        if(this.state.json !== null && editor !== null) {
+            editor.set(getJson(this.state.json));
         }
+    }
+  
+    componentWillUnmount() {
+        if(this.state.editor !== null) {
+            this.state.editor.destroy();
+        }
+    }
 
-        return (() => jsonEditor !== null ? jsonEditor.destroy() : null )
-    }, [ schema, schemas, json, container, jsonEditor, onEditable ])
-    
-    return (
-        <div className="jsoneditor-react-container" ref={ elem => setContainer(elem) } />
-    );
+    render() {
+        return (
+            <div className="jsoneditor-react-container" ref={ elem => this.setState( {container: elem } ) } />
+        )
+    } 
 }
 
 export default Editor; 

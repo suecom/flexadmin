@@ -1,4 +1,6 @@
 import integrationSdk from './../flexsdk';
+import { UUID } from './../types.js';
+
 
 class UserApi {
     getPage(page) {
@@ -16,31 +18,35 @@ class UserApi {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
-                var promises = [], users  = res.data.data, includes = res.data.included;;
+            var promises = [], users  = res.data.data, includes = res.data.included;;
 
-                // Start any required requests
-                while(page < res.data.meta.totalPages) {
-                    promises.push(this.getPage(++page));
-                }
+            // Start any required requests
+            while(page < res.data.meta.totalPages) {
+                promises.push(this.getPage(++page));
+            }
 
-                // Wait for them to complete and add the results
-                const values = await Promise.all(promises);
-                values.forEach(res => {
-                    users = users.concat(res.data.data);
-                    includes = includes.concat(res.data.included);
-                })
-
-                const images = includes !== undefined ? includes.filter(item => item.type === 'image') : [];
-
-                return { users, images };
+            // Wait for them to complete and add the results
+            const values = await Promise.all(promises);
+            values.forEach(res => {
+                users = users.concat(res.data.data);
+                includes = includes.concat(res.data.included);
             })
-        /*
-        return fetch('http://localhost:8081/api/users').then(response => {
-            return response.json();
+
+            const images = includes !== undefined ? includes.filter(item => item.type === 'image') : [];
+
+            return { users, images };
+        })
+    }
+
+    updateUser(uuid, updates) {
+        return integrationSdk.users.updateProfile({ 
+            id: new UUID(uuid),
+            updates
+        }).then(response => {
+            return response;
         }).catch(error => {
             return error;
         });
-        */
     }
 }
 
