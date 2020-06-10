@@ -1,6 +1,4 @@
 import integrationSdk from './../flexsdk';
-import { UUID } from './../types.js';
-
 
 class UserApi {
     getPage(page) {
@@ -38,11 +36,9 @@ class UserApi {
         })
     }
 
-    updateUser(uuid, updates) {
-        return integrationSdk.users.updateProfile({ 
-            id: new UUID(uuid),
-            updates
-        }).then(response => {
+    updateUser(updates) {
+        return integrationSdk.users.updateProfile(updates)
+        .then(response => {
             return response;
         }).catch(error => {
             return error;

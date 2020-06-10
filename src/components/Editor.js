@@ -4,6 +4,7 @@ import 'jsoneditor/dist/jsoneditor.css';
 
 import listingApi from '../api/listingApi';
 import userApi from '../api/userApi';
+import { UUID } from './../types.js';
 
 import './Editor.css';
 
@@ -54,20 +55,17 @@ const hasValues = (obj) => {
 }
 
 const createUpdates = (obj) => {
-    var res = [];
+	var RV = {}; 
   
-	for(const key in obj) {
-  		var o = {};  
-        
+	for(const key in obj) {     
   		// Ignore prototypes...
         if(!obj.hasOwnProperty(key)) continue;
         
         switch(key) {
-            case 'attributes':
+            // End names...
             case 'banned':
             case 'deleted':
             case 'emailVerified':       
-            case 'profile':
             case 'firstName':
             case 'lastName':
             case 'displayName':
@@ -83,20 +81,29 @@ const createUpdates = (obj) => {
             case 'metadata':
                 if(typeof obj[key] === 'object') {
                     if(hasValues(obj[key])) {
-                        o[key] = obj[key]
-                        res.push(o);
+                        //const keyStr = root === '' ? key : root+'.'+key;
+
+                        RV[key] = obj[key]
                     }
                 }
                 else {
-          			o[key] = obj[key]
-                    res.push(o);
-                }		
+                    //const keyStr = root === '' ? key : root+'.'+key;
+
+          			RV[key] = obj[key]
+                }				
                 break;
             default:
+            	if(typeof obj[key] === 'object') {
+                    //const keyStr = root === '' ? key : root+'.'+key;
+                	const n = createUpdates(obj[key])
+                    
+                    RV = Object.assign(RV, n)
+                }
+                break;
         }    
     }
 
-    return res;
+    return RV;
 }
 
 const getJson = (json) => {
@@ -380,12 +387,14 @@ class Editor extends Component {
         const o2 = this.state.editor.get();
 
         const obj = diff(o1, o2);
-        const updates = createUpdates(obj.attributes);
+        const updates = createUpdates(obj);
 
+        updates['id'] = new UUID(uuid)
         switch(type) {
             case 'listing':
                 api = new listingApi();
-                api.updateListing(uuid, updates).then(res => {
+                api.updateListing(updates).then(res => {
+                    this.setState({ json: this.state.editor.get() })
                     alert("Update succeeded");
                 })
                 .catch(error => {
@@ -394,7 +403,8 @@ class Editor extends Component {
                 break;
             case 'user':
                 api = new userApi();
-                api.updateUser(uuid, updates).then(res => {
+                api.updateUser(updates).then(res => {
+                    this.setState({ json: this.state.editor.get() })
                     alert("Update succeeded");
                 })
                 .catch(error => {

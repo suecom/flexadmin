@@ -1,5 +1,4 @@
 import integrationSdk from './../flexsdk';
-import { UUID } from './../types.js';
 
 class ListingApi {
     getPage(page) {
@@ -37,11 +36,9 @@ class ListingApi {
         })
     }
 
-    updateListing(uuid, updates) {
-        return integrationSdk.listings.update({ 
-            id: new UUID(uuid),
-            updates
-        }).then(response => {
+    updateListing(updates) {
+        return integrationSdk.listings.update(updates)
+        .then(response => {
             return response;
         }).catch(error => {
             return error;
