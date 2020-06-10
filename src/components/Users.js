@@ -211,7 +211,6 @@ const Users = ({ filterText, setFilterText }) => {
                 expandableRows
                 expandableRowsComponent={<Editor validSchema={'user'} />}  
                 expandOnRowClicked
-                //expandableIcon = {{ 'collapsed':  <svg><path d='../../logo.svg'/></svg>, 'expanded': <svg><path d='../../logo.svg'/></svg> }}
             />
         </div>
     )

@@ -4,6 +4,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
 
+import Editor from './Editor.js';
+
 const Messages = ({ filterText, setFilterText }) => {
     const location = useLocation();
     const history = useHistory();
@@ -161,7 +163,10 @@ const Messages = ({ filterText, setFilterText }) => {
                 fixedHeaderScrollHeight = '85vh'
                 noHeader
                 defaultSortField = 'attributes.createdAt' 
-                defaultSortAsc = { false }         
+                defaultSortAsc = { false }    
+                expandableRows
+                expandableRowsComponent={<Editor validSchema={'message'} />}  
+                expandOnRowClicked       
             />
         </div>
     )

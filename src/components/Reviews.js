@@ -4,6 +4,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
 
+import Editor from './Editor.js';
+
 const Reviews = ({ filterText, setFilterText }) => {
     const location = useLocation();
     const history = useHistory();
@@ -53,11 +55,20 @@ const Reviews = ({ filterText, setFilterText }) => {
         },
         {
             name: 'Rating',
-            cell: row => { return ( row.stars ) },
+            cell: row => { 
+                var k = []; 
+            
+                for(var i = 0; i < row.attributes.rating; i++) {
+                    var j = <span key={i} className="btn-outline-success fa fa-star checked"></span>;
+
+                    k.push(j)
+                }
+
+                return (k) 
+            },
             selector: 'attributes.rating',
             sortable: true,
             compact: true,
-            //right: true,
             width: '70px',
         },
         {
@@ -122,14 +133,6 @@ const Reviews = ({ filterText, setFilterText }) => {
                 review.subjectEmail = s[0].attributes.email;
                 review.subjectId = s[0].id.uuid;
             }
-
-            var k = []; 
-            for(var i = 0; i < review.attributes.rating; i++) {
-                var j = <span key={i} className="btn-outline-success fa fa-star checked"></span>;
-
-                k.push(j)
-            }
-            review.stars = k;
         })
 
         return reviews;
@@ -152,7 +155,10 @@ const Reviews = ({ filterText, setFilterText }) => {
                 fixedHeaderScrollHeight = '85vh'
                 noHeader
                 defaultSortField = 'attributes.createdAt' 
-                defaultSortAsc = { false }         
+                defaultSortAsc = { false } 
+                expandableRows
+                expandableRowsComponent={<Editor validSchema={'review'} />}  
+                expandOnRowClicked        
             />
         </div>
     )

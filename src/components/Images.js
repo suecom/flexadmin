@@ -4,6 +4,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
 
+import Editor from './Editor.js';
+
 const Images = ({ filterText, setFilterText }) => {
     const location = useLocation();
     const history = useHistory();
@@ -58,8 +60,8 @@ const Images = ({ filterText, setFilterText }) => {
         },
         {
             name: 'Name',
-            cell: row => { return(<a type='button' href="!#" onClick={e => {e.preventDefault(); row.origin==='User' ? clickUser(e) : clickListing(e) }} rel={row.nameId}>{row.name}</a>) },
-            selector: 'name',
+            cell: row => { return(<a type='button' href="!#" onClick={e => {e.preventDefault(); row.origin==='User' ? clickUser(e) : clickListing(e) }} rel={row.userId}>{row.user}</a>) },
+            selector: 'user',
             sortable: true,
             compact: true,
         },   
@@ -74,7 +76,7 @@ const Images = ({ filterText, setFilterText }) => {
         var retVal = terms.length === 0 || terms[0].length === 0 ? true : false;
 
         for(var i = 0; i < terms.length && terms[i].length > 0 && retVal === false; i++) {
-            retVal = image.name.toLowerCase().search(terms[i]) !== -1 ||
+            retVal = image.user.toLowerCase().search(terms[i]) !== -1 ||
                 image.userEmail.toLowerCase().search(terms[i]) !== -1 ||
                 image.id.uuid.toLowerCase().search(terms[i]) !== -1
         }
@@ -109,8 +111,8 @@ const Images = ({ filterText, setFilterText }) => {
             const user = users.filter(u => u.relationships !== undefined && u.relationships.profileImage !== undefined && u.relationships.profileImage.data !== undefined && u.relationships.profileImage.data !== null ? u.relationships.profileImage.data.id.uuid === image.id.uuid : false);
 
             if(user.length > 0) {
-                image.name = user[0].attributes.profile.firstName + ' ' + user[0].attributes.profile.lastName;
-                image.nameId = user[0].id.uuid;
+                image.user = user[0].attributes.profile.firstName + ' ' + user[0].attributes.profile.lastName;
+                image.userId = user[0].id.uuid;
                 image.userEmail = user[0].attributes.email;
                 image.origin = 'User';
             }
@@ -119,8 +121,8 @@ const Images = ({ filterText, setFilterText }) => {
                     const list = listing.relationships.images.data.filter(i => i.id.uuid === image.id.uuid);
 
                     if(list.length > 0) {
-                        image.name = listing.attributes.title;
-                        image.nameId = listing.id.uuid;
+                        image.user = listing.attributes.title;
+                        image.userId = listing.id.uuid;
                         image.userEmail = '';
                         image.origin = 'Listing';
                     }
@@ -157,7 +159,10 @@ const Images = ({ filterText, setFilterText }) => {
                 fixedHeaderScrollHeight = "85vh"
                 noHeader  
                 defaultSortField = 'attributes.createdAt' 
-                defaultSortAsc = { false }            
+                defaultSortAsc = { false }  
+                expandableRows
+                expandableRowsComponent={<Editor validSchema={'image'} />}  
+                expandOnRowClicked          
             />
         </div>
     )

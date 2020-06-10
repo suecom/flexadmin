@@ -114,10 +114,33 @@ const getJson = (json) => {
     delete newData['clients'];
     delete newData['rentals'];
     delete newData['reviews'];
+    delete newData['messages'];
     delete newData['enquires'];
+    delete newData['author'];
+    delete newData['authorId'];
+    delete newData['authorEmail'];
+    delete newData['subject'];
+    delete newData['subjectId'];
+    delete newData['subjectEmail'];
     delete newData['owner'];
     delete newData['ownerId'];
     delete newData['ownerEmail'];
+    delete newData['provider'];
+    delete newData['providerId'];
+    delete newData['providerEmail'];
+    delete newData['user'];
+    delete newData['userId'];
+    delete newData['userEmail'];
+    delete newData['origin'];
+    delete newData['customer'];
+    delete newData['customerId'];
+    delete newData['customerEmail'];
+    delete newData['listing'];
+    delete newData['listingId'];
+    delete newData['createdAt'];
+    delete newData['updatedAt'];
+    delete newData['__v'];
+    delete newData['url'];
     newData.attributes.createdAt = (json.attributes.createdAt instanceof Object) ? json.attributes.createdAt.toLocaleDateString() + ' ' + json.attributes.createdAt.toLocaleTimeString() : json.attributes.createdAt;
 
     return newData;
@@ -300,7 +323,8 @@ const listing = {
                     'type': 'object',
                     'properties': {
                         'data' : { 'type': [ 'null', 'array'] }
-                    }
+                    },
+                    'additionalProperties': false,
                 },
                 'additionalProperties': false,
             },
@@ -309,6 +333,276 @@ const listing = {
         }    
     },    
     'required': [ 'id', 'type', 'attributes', 'relationships' ],
+    'additionalProperties': false
+}
+
+const transaction = {
+    'title': 'transaction',
+    'type': 'object',
+    'properties': {
+        'id': {
+            'type': 'object',
+            'readOnly': true,
+            'properties': {
+                '_sdkType': { 'type': 'string', 'const': 'UUID' },
+                'uuid': { 'type': 'string' }
+            }
+        },
+        'type': { 'readonly': true, 'type': 'string', 'const': 'transaction' },
+        'attributes': {
+            'type': 'object',
+            'properties': {
+                'createdAt': { 'type': 'string' },
+                'processName': { 'type': 'string', 'const': 'preauth-with-daily-booking' },
+                'processVersion': { 'type': 'integer', 'const': 1 },
+                'lastTransition': { 'type': 'string' },
+                'lastTransitionedAt': { 'type': 'string' },
+                'payinTotal': {
+                    'type': 'object',
+                    'readOnly': true,
+                    'properties': {
+                        '_sdkType': { 'type': 'string', 'const': 'Money' },
+                        'amount': { 'type': [ 'number', 'null' ] },
+                        'currency': { 'type': 'string' }
+                    },
+                    'additionalProperties': false, 
+                },
+                'payoutTotal': {
+                    'type': 'object',
+                    'readOnly': true,
+                    'properties': {
+                        '_sdkType': { 'type': 'string', 'const': 'Money' },
+                        'amount': { 'type': [ 'number', 'null' ] },
+                        'currency': { 'type': 'string' }
+                    },
+                    'additionalProperties': false,
+                },
+                'lineItems': { 
+                    'type': 'array',
+                },
+                'transitions': {
+                    'type': 'array',
+                },       
+                'protectedData': {
+                    'type': 'object',
+                    'properties': {
+                    }
+                }              
+            },
+            'additionalProperties': false,
+            'required': [ 'createdAt', 'processName', 'processVersion', 'lastTransition', 'lastTransitionedAt', 'payinTotal', 'payoutTotal', 'lineItems', 'transitions' ],
+        },
+        'relationships' : {
+            'readonly': true,
+            'type': 'object',
+            'properties': {
+                'listing': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': 'object' }
+                    },
+                    'additionalProperties': false,
+                },
+                'provider': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': [ 'null', 'object' ] }
+                    },
+                    'additionalProperties': false,
+                },
+                'customer': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': [ 'null', 'object' ] }
+                    },
+                    'additionalProperties': false,
+                },
+                'booking': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': [ 'null', 'object' ] }
+                    },
+                    'additionalProperties': false,
+                },
+                'reviews': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': [ 'null', 'array' ] }
+                    },
+                    'additionalProperties': false,
+                },
+                'messages': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': [ 'null', 'array' ] }
+                    },
+                    'additionalProperties': false,
+                },
+                'additionalProperties': false,
+            },
+            'required': [ 'listing', 'provider', 'customer', 'reviews', 'messages' ],
+            'additionalProperties': false     
+        }    
+    },    
+    'required': [ 'id', 'type', 'attributes', 'relationships' ],
+    'additionalProperties': false
+}
+
+const review = {
+    'title': 'review',
+    'type': 'object',
+    'properties': {
+        'id': {
+            'type': 'object',
+            'readOnly': true,
+            'properties': {
+                '_sdkType': { 'type': 'string', 'const': 'UUID' },
+                'uuid': { 'type': 'string' }
+            }
+        },
+        'type': { 'readonly': true, 'type': 'string', 'const': 'review' },
+        'attributes': {
+            'type': 'object',
+            'properties': {
+                'createdAt': { 'type': 'string' },
+                'type': { 'type': 'string' },
+                'state': { 'type': 'string' },
+                'rating': { 'type': 'integer' },
+                'content': { 'type': 'string' },
+                'deleted': { 'type': 'boolean' },         
+            },
+            'additionalProperties': false,
+            'required': [ 'createdAt', 'type', 'state', 'rating', 'content', 'deleted' ],
+        },
+        'relationships' : {
+            'readonly': true,
+            'type': 'object',
+            'properties': {
+                'author': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': 'object' }
+                    },
+                    'additionalProperties': false,
+                },
+                'listing': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': 'object' }
+                    },
+                    'additionalProperties': false,
+                },
+                'subject': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': 'object' }
+                    },
+                    'additionalProperties': false,
+                },
+                'additionalProperties': false,
+            },
+            'required': [ 'listing', 'author', 'subject' ],
+            'additionalProperties': false     
+        }    
+    },    
+    'required': [ 'id', 'type', 'attributes', 'relationships' ],
+    'additionalProperties': false
+}
+
+const message = {
+    'title': 'message',
+    'type': 'object',
+    'properties': {
+        'id': {
+            'type': 'object',
+            'readOnly': true,
+            'properties': {
+                '_sdkType': { 'type': 'string', 'const': 'UUID' },
+                'uuid': { 'type': 'string' }
+            }
+        },
+        'type': { 'readonly': true, 'type': 'string', 'const': 'message' },
+        'attributes': {
+            'type': 'object',
+            'properties': {
+                'createdAt': { 'type': 'string' },
+                'content': { 'type': 'string' },      
+            },
+            'additionalProperties': false,
+            'required': [ 'createdAt', 'content' ],
+        },
+        'relationships' : {
+            'readonly': true,
+            'type': 'object',
+            'properties': {
+                'sender': {
+                    'readonly': true,
+                    'type': 'object',
+                    'properties': {
+                        'data' : { 'type': 'object' }
+                    },
+                    'additionalProperties': false,
+                },
+                'additionalProperties': false,
+            },
+            'required': [ 'sender' ],
+            'additionalProperties': false     
+        }    
+    },    
+    'required': [ 'id', 'type', 'attributes', 'relationships' ],
+    'additionalProperties': false
+}
+
+const image = {
+    'title': 'image',
+    'type': 'object',
+    'properties': {
+        'id': {
+            'type': 'object',
+            'readOnly': true,
+            'properties': {
+                '_sdkType': { 'type': 'string', 'const': 'UUID' },
+                'uuid': { 'type': 'string' }
+            }
+        },
+        'type': { 'readonly': true, 'type': 'string', 'const': 'image' },
+        'attributes': {
+            'type': 'object',
+            'properties': {
+                'variants': { 
+                    'type': 'object',
+                    'properties': {
+                        'square-small': { 'type': 'object' },
+                        'square-small2x': { 'type': 'object' },
+                        'default': { 'type': 'object' },
+                        'landscape-crop': { 'type': 'object' },
+                        'landscape-crop2x': { 'type': 'object' },
+                        'landscape-crop4x': { 'type': 'object' },
+                        'landscape-crop6x': { 'type': 'object' },
+                        'scaled-small': { 'type': 'object' },
+                        'scaled-medium': { 'type': 'object' },
+                        'scaled-large': { 'type': 'object' },
+                        'scaled-xlarge': { 'type': 'object' }
+                    },
+                    'additionalProperties': false,
+                    'required': [ 'square-small', 'square-small2x' ]
+                },
+                'additionalProperties': false,
+            },
+            'additionalProperties': false,
+            'required': [ 'variants' ],
+        }
+    },    
+    'required': [ 'id', 'type', 'attributes' ],
     'additionalProperties': false
 }
 
@@ -346,6 +640,7 @@ class Editor extends Component {
             case 'currency':
             case 'author':
             case 'images':
+            case 'listing':
             case 'email':
             case 'createdAt':
             case 'geolocation':
@@ -353,7 +648,22 @@ class Editor extends Component {
             case 'lat':
             case 'lng':
             case 'pendingEmail':
+            case 'payinTotal':
+            case 'payoutTotal':
+            case 'processName':
+            case 'processVersion':
+            case 'lastTransition':
+            case 'lastTransitionedAt':
+            case 'lineItems':
+            case 'transitions':
+            case 'content':
+            case 'width':
+            case 'height':
+            case 'name':
+            case 'url':
+            case 'variants':
                 return false
+            case 'rating':
             case 'attributes':
             case 'banned':
             case 'deleted':
@@ -386,6 +696,7 @@ class Editor extends Component {
         const o1 = JSON.parse(JSON.stringify(getJson(this.state.json)));
         const o2 = this.state.editor.get();
 
+        // Find any differences and create an API compatable list
         const obj = diff(o1, o2);
         const updates = createUpdates(obj);
 
@@ -419,32 +730,36 @@ class Editor extends Component {
     }
 
     onValidationError = (errors) => {
-        var button = this.state.button;
+        if(this.state.json.type === 'listing' || this.state.json.type === 'user') {
+            var button = this.state.button;
 
-        this.setState({ errors: errors.length } );
-        if(errors.length > 0) {
-            button.disabled = true;
-        }
-        else {
-            const s1 = JSON.stringify(getJson(this.state.json));
-            const s2 = JSON.stringify(this.state.editor.get());
-        
-            if(s1 !== s2) {
-                button.disabled = false;
+            this.setState({ errors: errors.length } );
+            if(errors.length > 0) {
+                button.disabled = true;
+            }
+            else {
+                const s1 = JSON.stringify(getJson(this.state.json));
+                const s2 = JSON.stringify(this.state.editor.get());
+            
+                if(s1 !== s2) {
+                    button.disabled = false;
+                }
             }
         }
     }
 
     onChange = () => {
-        var button = this.state.button;
-        const s1 = JSON.stringify(getJson(this.state.json));
-        const s2 = JSON.stringify(this.state.editor.get());
+        if(this.state.json.type === 'listing' || this.state.json.type === 'user') {
+            var button = this.state.button;
+            const s1 = JSON.stringify(getJson(this.state.json));
+            const s2 = JSON.stringify(this.state.editor.get());
 
-        if(s1 !== s2 && this.state.errors === 0) {
-            button.disabled = false;
-        }
-        else {
-            button.disabled = true;
+            if(s1 !== s2 && this.state.errors === 0) {
+                button.disabled = false;
+            }
+            else {
+                button.disabled = true;
+            }
         }
     }
 
@@ -469,6 +784,10 @@ class Editor extends Component {
             const schemas = {
                 'user': user,
                 'listing': listing,
+                'transaction': transaction,
+                'review': review,
+                'message': message,
+                'image': image,
             };
             const options = {
                 mode: 'tree',

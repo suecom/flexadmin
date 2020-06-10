@@ -4,6 +4,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
 
+import Editor from './Editor.js';
+
 var formatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: 'GBP',
@@ -234,7 +236,10 @@ const Transactions = ({ filterText, setFilterText }) => {
                 fixedHeaderScrollHeight = '85vh'
                 noHeader
                 defaultSortField = 'attributes.createdAt' 
-                defaultSortAsc = { false }                    
+                defaultSortAsc = { false }  
+                expandableRows
+                expandableRowsComponent={<Editor validSchema={'transaction'} />}  
+                expandOnRowClicked                  
             />
         </div>
     )
