@@ -12,6 +12,7 @@ const Messages = ({ filterText, setFilterText }) => {
     const users = useSelector(state => state.users);
     const transactions = useSelector(state => state.transactions);
     const messages = useSelector(state => state.messages);
+    const listings = useSelector(state => state.listings);
     const customStyles = {
         headCells: {
             style: {
@@ -19,6 +20,16 @@ const Messages = ({ filterText, setFilterText }) => {
             },
         },
     }
+
+    const clickListing = useCallback((e) => {
+        const list = listings.filter(list => list.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/listings?search=' + list[0].attributes.title);
+    }, [ listings, history, filterText, location.pathname ]);
 
     const clickUser = useCallback((e) => {
         const user = users.filter(user => user.id.uuid === e.target.rel);
@@ -55,11 +66,19 @@ const Messages = ({ filterText, setFilterText }) => {
             maxWidth: '150px',
         },
         {
+            name: 'Regards',
+            cell: row => { return(<a type="button" href="#!" onClick={e => {e.preventDefault(); clickListing(e);}} rel={row.listingId}>{row.listing}</a>) },
+            selector: 'listing',
+            sortable: true,
+            compact: true,
+            maxWidth: '150px',
+        },
+        {
             name: 'Message',
             selector: 'attributes.content',
             compact: false,
         },  
-    ], [ clickUser ])
+    ], [ clickUser, clickListing ])
     
     const filterMessage = (message) => {
         const terms = filterText.toLowerCase().split(',');
@@ -138,13 +157,21 @@ const Messages = ({ filterText, setFilterText }) => {
                             message.subjectEmail = '';
                             message.subjectId = '0';
                         }
+
+                        // Add a listing reference
+                        const l = listings.filter(list => tran.relationships.listing.data.id.uuid === list.id.uuid);
+
+                        if(l.length > 0) {
+                            message.listing = l[0].attributes.title;
+                            message.listingId = l[0].id.uuid;
+                        }
                     }
                 }
             }
         })
 
         return messages;
-    }, [ messages, users, transactions ])
+    }, [ messages, users, transactions, listings ])
 
     const data = useMemo(() => messagesPlus(), [ messagesPlus ])
 

@@ -11,6 +11,7 @@ const Reviews = ({ filterText, setFilterText }) => {
     const history = useHistory();
     const users = useSelector(state => state.users);
     const reviews = useSelector(state => state.reviews);
+    const listings = useSelector(state => state.listings);
     const customStyles = {
         headCells: {
             style: {
@@ -18,6 +19,16 @@ const Reviews = ({ filterText, setFilterText }) => {
             },
         }
     };
+
+    const clickListing = useCallback((e) => {
+        const list = listings.filter(list => list.id.uuid === e.target.rel);
+        
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/listings?search=' + list[0].attributes.title);
+    }, [ listings, history, filterText, location.pathname ]);
 
     const clickUser = useCallback((e) => {
         const user = users.filter(user => user.id.uuid === e.target.rel);
@@ -54,6 +65,14 @@ const Reviews = ({ filterText, setFilterText }) => {
             maxWidth: '150px'
         },
         {
+            name: 'Regards',
+            cell: row => { return(<a type="button" href="!#" onClick={e => {e.preventDefault(); clickListing(e);}} rel={row.listingId}>{row.listing}</a>) },
+            selector: 'listing',
+            sortable: true,
+            compact: true,
+            maxWidth: '150px'
+        },
+        {
             name: 'Rating',
             cell: row => { 
                 var k = []; 
@@ -77,7 +96,7 @@ const Reviews = ({ filterText, setFilterText }) => {
             sortable: true,
             compact: false,
         },  
-    ], [ clickUser ]);
+    ], [ clickUser, clickListing ]);
     
     const filterReview = (review) => {
         const terms = filterText.toLowerCase().split(',');
@@ -88,7 +107,8 @@ const Reviews = ({ filterText, setFilterText }) => {
                     review.subject.toLowerCase().search(terms[i]) !== -1 ||
                     review.authorEmail.toLowerCase().search(terms[i]) !== -1 ||
                     review.subjectEmail.toLowerCase().search(terms[i]) !== -1 ||
-                    review.id.uuid.toLowerCase().search(terms[i]) !== -1 
+                    review.id.uuid.toLowerCase().search(terms[i]) !== -1 ||
+                    review.listing.toLowerCase().search(terms[i]) !== -1
         }
 
         return retVal;
@@ -133,10 +153,17 @@ const Reviews = ({ filterText, setFilterText }) => {
                 review.subjectEmail = s[0].attributes.email;
                 review.subjectId = s[0].id.uuid;
             }
+
+            const l = listings.filter(list => review.relationships.listing.data.id.uuid === list.id.uuid);
+
+            if(l.length > 0) {
+                review.listing = l[0].attributes.title;
+                review.listingId = l[0].id.uuid;
+            }
         })
 
         return reviews;
-    }, [ reviews, users ])
+    }, [ reviews, users, listings ])
 
     const data = useMemo(() => reviewsPlus(), [ reviewsPlus ])
 

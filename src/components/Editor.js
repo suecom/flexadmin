@@ -355,8 +355,8 @@ const transaction = {
             'type': 'object',
             'properties': {
                 'createdAt': { 'type': 'string' },
-                'processName': { 'type': 'string', 'const': 'preauth-with-daily-booking' },
-                'processVersion': { 'type': 'integer', 'const': 1 },
+                'processName': { 'type': 'string' },
+                'processVersion': { 'type': 'integer' },
                 'lastTransition': { 'type': 'string' },
                 'lastTransitionedAt': { 'type': 'string' },
                 'payinTotal': {
@@ -480,7 +480,7 @@ const review = {
                 'deleted': { 'type': 'boolean' },         
             },
             'additionalProperties': false,
-            'required': [ 'createdAt', 'type', 'state', 'rating', 'content', 'deleted' ],
+            'required': [ 'createdAt', 'type', 'state', 'rating', 'content' ],
         },
         'relationships' : {
             'readonly': true,
@@ -595,8 +595,7 @@ const image = {
                         'scaled-large': { 'type': 'object' },
                         'scaled-xlarge': { 'type': 'object' }
                     },
-                    'additionalProperties': false,
-                    'required': [ 'square-small', 'square-small2x' ]
+                    'additionalProperties': false
                 },
                 'additionalProperties': false,
             },

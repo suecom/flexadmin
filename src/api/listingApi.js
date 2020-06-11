@@ -38,9 +38,9 @@ class ListingApi {
                 return { listings, images };
             }
             else {
-                var listings = [], images = [];
+                var lists = [], images = [];
 
-                return { listings, images }
+                return { lists, images }
             }
         })
     }

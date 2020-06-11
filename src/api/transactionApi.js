@@ -31,6 +31,19 @@ class TransactionApi {
                 })
 
                 const reviews = includes !== undefined ? includes.filter(item => item.type === 'review') : [];
+                if(reviews.length > 0 && reviews[0].relationships.listing === undefined) {
+                    // This is the case using the Sharetribe Integration API (no nesting listing relationships). Build...
+                    reviews.forEach(rev => {
+                        for(var i = 0; i < transactions.length && rev.relationships.listing === undefined; i++) {
+                            for(var j = 0; transactions[i].relationships.reviews.data !== null && j < transactions[i].relationships.reviews.data.length; j++) {
+                                if(transactions[i].relationships.reviews.data[j].id.uuid === rev.id.uuid) {
+                                    rev.relationships.listing = transactions[i].relationships.listing;
+                                    break;
+                                }
+                            } 
+                        }
+                    })
+                }
                 const messages = includes !== undefined ? includes.filter(item => item.type === 'message') : [];
 
                 return { transactions, reviews, messages };
