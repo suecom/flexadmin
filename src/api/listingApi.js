@@ -18,7 +18,7 @@ class ListingApi {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
-            if(res != null) {
+            if(res !== null && res.data !== undefined) {
                 var promises = [], listings  = res.data.data, includes = res.data.included;
 
                 // Start any required requests
@@ -38,9 +38,9 @@ class ListingApi {
                 return { listings, images };
             }
             else {
-                var lists = [], images = [];
+                var l = [], images = [];
 
-                return { lists, images }
+                return { listings: l, images }
             }
         })
     }

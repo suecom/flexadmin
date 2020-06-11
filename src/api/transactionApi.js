@@ -16,6 +16,7 @@ class TransactionApi {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
+            if(res !== null && res.data !== undefined) {
                 var promises = [], transactions  = res.data.data, includes = res.data.included;
 
                 // Start any required requests
@@ -47,7 +48,13 @@ class TransactionApi {
                 const messages = includes !== undefined ? includes.filter(item => item.type === 'message') : [];
 
                 return { transactions, reviews, messages };
-            })
+            }
+            else {
+                var t = [], reviews = [], messages = [];
+
+                return { transactions: t, reviews, messages }
+            }
+        })
     }
 }
 

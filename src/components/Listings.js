@@ -124,7 +124,7 @@ const Listings = ({ filterText, setFilterText }) => {
         },   
         {
             name: 'Enquiries',
-            selector: 'enquire',
+            selector: 'enquires',
             sortable: true,
             width: '70px',
             compact: false,

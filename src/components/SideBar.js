@@ -37,6 +37,7 @@ const SideBar = ({ routes }) =>  {
             default:
                 break;
         }
+
         return <p>{route.label}({cnt})</p> 
     }, [ users, listings, transactions, reviews, messages, images ])
 

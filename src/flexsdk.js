@@ -6,4 +6,6 @@ const integrationSdk = flexIntegrationSdk.createInstance({
     baseUrl: process.env.REACT_APP_FLEX_INTEGRATION_BASE_URL || 'https://flex-api.sharetribe.com'
 });
 
+console.log('Using: ', process.env.REACT_APP_FLEX_INTEGRATION_BASE_URL || 'https://flex-api.sharetribe.com')
+
 export default integrationSdk;
