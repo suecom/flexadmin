@@ -89,7 +89,8 @@ const Messages = ({ filterText, setFilterText }) => {
                     message.subject.toLowerCase().search(terms[i]) !== -1 ||
                     message.authorEmail.toLowerCase().search(terms[i]) !== -1 ||
                     message.subjectEmail.toLowerCase().search(terms[i]) !== -1 ||
-                    message.id.uuid.toLowerCase().search(terms[i]) !== -1 
+                    message.id.uuid.toLowerCase().search(terms[i]) !== -1 ||
+                    message.listing.toLowerCase().search(terms[i]) !== -1
         }
 
         return retVal;
@@ -164,6 +165,10 @@ const Messages = ({ filterText, setFilterText }) => {
                         if(l.length > 0) {
                             message.listing = l[0].attributes.title;
                             message.listingId = l[0].id.uuid;
+                        }
+                        else {
+                            message.listing ='';
+                            message.listingId = '0';
                         }
                     }
                 }

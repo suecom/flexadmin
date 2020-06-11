@@ -11,6 +11,8 @@ import Header from './components/Header';
 import SideBar from './components/SideBar';
 import Content from './components/Content';
 
+import routes from './routes';
+
 // Initialize and load store
 const store = configureStore();
 
@@ -27,7 +29,7 @@ const App = (props) => {
       <Provider store={store}>
         <Router>
           <Header filterText={ filter } setFilterText={ setFilterText } { ...props } />
-          <SideBar  />
+          <SideBar  routes={ routes } { ...props } />
           <Content filterText={ filter } setFilterText={ setFilterText } { ...props } />
         </Router>
       </Provider>
