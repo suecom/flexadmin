@@ -109,6 +109,8 @@ const createUpdates = (obj) => {
 const getJson = (json) => {
     var newData = JSON.parse(JSON.stringify(json));
 
+    // This removes the fields added for display purposes (used in columns) that 
+    // are not part of the stored record
     delete newData['_id'];
     delete newData['listings'];
     delete newData['clients'];
@@ -260,7 +262,7 @@ const listing = {
                 'title': { 'type': 'string' },
                 'description': { 'type': 'string' },
                 'deleted': { 'type': 'boolean' },
-                'state': { 'type': 'string' },
+                'state': { 'type': 'string', 'enum': [ 'published', 'draft', 'pendingApproval', 'closed' ] },
                 'createdAt': { 'type': 'string' },
                 'geolocation': {
                     'type': 'object',
@@ -472,7 +474,7 @@ const review = {
             'properties': {
                 'createdAt': { 'type': 'string' },
                 'type': { 'type': 'string' },
-                'state': { 'type': 'string' },
+                'state': { 'type': 'string', 'enum': [ 'public', 'pending' ] },
                 'rating': { 'type': 'integer' },
                 'content': { 'type': 'string' },
                 'deleted': { 'type': 'boolean' },         

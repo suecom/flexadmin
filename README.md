@@ -6,6 +6,9 @@ This is an alternate admin console. The motivation is to allow the use of the FF
 
 Styling is taken from CoreUIs AdminLTE template, and I apologise in advance for my lack of UI design skills. Maybe you could improve?
 
+NOTE: Some of the schema editing will NOT work when using the Sharetribe Integration API
+(listing state/deleted for example), as these resources are not in the 'update' API. They should use the open/close/approve APIs - TODO
+
 ## Quick start (no such thing!)
 
 You will need:
