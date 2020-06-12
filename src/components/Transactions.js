@@ -157,7 +157,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             location.search = '';
             location.state = null;
         }
-        else if(location.state !== null && location.state.filterText !== undefined) {
+        else if(location.state !== undefined && location.state !== null && location.state.filterText !== undefined) {
             setFilterText(location.state.filterText);
             location.state = null;
         } 

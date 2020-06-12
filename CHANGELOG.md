@@ -8,6 +8,10 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v0.6.0]
+
+Added user authentication
+
 ## [v0.5.0]
 
 Added JSON editor with write/update capability for users and listings

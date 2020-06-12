@@ -1,4 +1,4 @@
-import integrationSdk from './../flexsdk';
+import { integrationSdk } from './../flexsdk';
 
 class UserApi {
     getPage(page) {

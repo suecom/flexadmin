@@ -176,7 +176,7 @@ const Listings = ({ filterText, setFilterText }) => {
             location.search = '';
             location.state = null;
         }
-        else if(location.state !== null && location.state.filterText !== undefined) {
+        else if(location.state !== undefined && location.state !== null && location.state.filterText !== undefined) {
             setFilterText(location.state.filterText);
             location.state = null;
         } 
@@ -238,7 +238,8 @@ const Listings = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }      
                 expandableRows
-                expandableRowsComponent={<Editor validSchema={'listing'} />}         
+                expandableRowsComponent={<Editor validSchema={'listing'} />}   
+                expandOnRowClicked      
             />
         </div>
     )

@@ -108,7 +108,8 @@ const Reviews = ({ filterText, setFilterText }) => {
                     review.authorEmail.toLowerCase().search(terms[i]) !== -1 ||
                     review.subjectEmail.toLowerCase().search(terms[i]) !== -1 ||
                     review.id.uuid.toLowerCase().search(terms[i]) !== -1 ||
-                    review.listing.toLowerCase().search(terms[i]) !== -1
+                    review.listing.toLowerCase().search(terms[i]) !== -1 ||
+                    review.attributes.content.toLowerCase().search(terms[i]) !== -1
         }
 
         return retVal;
@@ -123,7 +124,7 @@ const Reviews = ({ filterText, setFilterText }) => {
             location.search = '';
             location.state = null;
         }
-        else if(location.state !== null && location.state.filterText !== undefined) {
+        else if(location.state !== undefined && location.state !== null && location.state.filterText !== undefined) {
             setFilterText(location.state.filterText);
             location.state = null;
         } 
