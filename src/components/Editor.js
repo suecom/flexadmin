@@ -683,6 +683,10 @@ class Editor extends Component {
             case 'privateData':
             case 'protectedData':
             case 'metadata':
+            case 'make':
+            case 'model':
+            case 'year':
+            case 'rules':
                 return {
                     field: false,
                     value: true

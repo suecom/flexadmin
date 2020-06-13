@@ -13,16 +13,15 @@ const renderMergedProps = (component, ...rest) => {
     );
 }
 
-const AuthRoute = (props) => {
-    return (
-        <Route { ...props }
-            render = { (routeProps) =>
-                props.isAuth ? ( renderMergedProps(props.Component, routeProps, props) ) :
-                ( <Redirect to={{ pathname: '/login', requestedPath: props.path}} /> )
-            }
-        />
-    )
-}
+const AuthRoute = (props) => (
+    <Route {...props}
+        render = { (routerProps) => (
+            props.isAuth === true 
+                ? ( renderMergedProps(props.comp, routerProps, props) ) 
+                : ( renderMergedProps(Login, routerProps, { requestedPath: props.path, submit: props.submit, message: props.message }) ) 
+        )}
+    />
+)
 
 const Content = (props) => {
     const [ isAuth, setAuth ] = useState(false);
@@ -35,6 +34,7 @@ const Content = (props) => {
                     if(res.data.data.attributes.profile.protectedData.admin !== undefined &&
                             res.data.data.attributes.profile.protectedData.admin === true) {
                         setAuth(true);
+
                         if(location.requestedPath !== undefined) {
                             history.push(location.requestedPath)
                         }
@@ -55,25 +55,38 @@ const Content = (props) => {
         })
     }
 
+    if(!isAuth) {
+        marketplaceSdk.currentUser.show().then(res => {
+            if(res != null &&
+                    res.data.data.attributes.profile.protectedData.admin !== undefined &&
+                    res.data.data.attributes.profile.protectedData.admin === true) {
+                setAuth(true);
+            }
+        });
+    }
+
     return (
         <div className="content-wrapper">            
-            <Switch>
+            <Switch>          
                 {routes.map((route, index) => (
                     <AuthRoute { ...props } 
                         key = { index }
                         path = { route.path }
                         exact = { route.exact } 
                         isAuth = { isAuth }    
-                        Component = { route.component }  
+                        comp = { route.component }  
+                        submit = { handleSubmit }
+                        message = { message }
                     />
                 ))}
                 <Route { ...props }
-                    path='/'
-                    exact={ false } 
-                    render = { 
-                        (routeProps) => { return renderMergedProps(Login, routeProps, { submit: handleSubmit, message: message })} 
-                    } 
+                    path='/login'
+                    exact={ true } 
+                    render = { (routerProps) => 
+                        renderMergedProps(Login, routerProps, { submit: handleSubmit, message: message }) 
+                    }
                 />
+                <Route path='*' component={() => <Redirect to="/Users" />}/>
             </Switch>
         </div>
     )

@@ -27,7 +27,7 @@ const App = (props) => {
   return (
     <div className="wrapper">
       <Provider store={store}>
-        <Router>
+        <Router >
           <Header filterText={ filter } setFilterText={ setFilterText } { ...props } />
           <SideBar  routes={ routes } { ...props } />
           <Content filterText={ filter } setFilterText={ setFilterText } { ...props } />
