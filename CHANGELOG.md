@@ -8,6 +8,10 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v0.7.0]
+
+Added logout and fixed login
+
 ## [v0.6.0]
 
 Added user authentication

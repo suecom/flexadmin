@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 
-const Login = ({ submit, message, location, history }) =>  {
+const Login = ({ authSubmit, authMessage, location, history }) =>  {
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
 
@@ -9,14 +9,14 @@ const Login = ({ submit, message, location, history }) =>  {
 
         if(email === '' || password === '') return;
 
-        submit(email, password, location, history )
-    }, [ submit, location, history, email, password ]);
+        authSubmit(email, password, location, history )
+    }, [ authSubmit, location, history, email, password ]);
 
     return (
         <div className="login-box">
             <div className="card">
                 <div className="card-body login-card-body">
-                    <p className={message.style}>{ message.text }</p>
+                    <p className={authMessage.style}>{ authMessage.text }</p>
                     <form onSubmit={handleSubmit}>
                         <div className="input-group mb-3">
                             <input type="email" className="form-control" placeholder="Email" onChange={e => setEmail(e.target.value)} />

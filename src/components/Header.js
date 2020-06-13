@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ filterText, setFilterText }) => {
+const Header = ({ filterText, setFilterText, isAuth, logout }) => {
     function onChange(e) {
         setFilterText(e.target.value)
     }
@@ -21,7 +21,19 @@ const Header = ({ filterText, setFilterText }) => {
                         <i className="fas fa-search" />
                     </button>
                 </div>
-            </div>    
+            </div> 
+
+            {/* login/logout controls */}
+            <ul className="navbar-nav ml-auto">
+                <li className="nav-item dropdown">
+                    <a className="nav-link" data-toggle="dropdown" onClick={e => {e.preventDefault(); logout(e);}} href="#">
+                        { isAuth !== true 
+                            ? <i className="fas fa-sign-in-alt" /> 
+                            : <i className="fas fa-sign-out-alt"/>
+                        }
+                    </a>
+                </li>
+            </ul>
         </nav>
     )
 }

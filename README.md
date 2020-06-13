@@ -38,6 +38,10 @@ Then simple deploy (and repeat after you make changes to the master branch):
 
 You now have to set the REACT_APP_ environment variables for the app (see above) in the heroku app using the webportal or CLI. The app will be assecible at https://<app-name>.herokuapp.com after setting the variables and re-starting.
 
+To login we use the Marketplace authentication API. YES, we're using BOTH SDKs in the same project! The reason for this is I didnt want to involve another auth server when we already have one! As the Integration API is hard-coded to the cleint IDs, this provides no protection when exposed externally (on the Internet). 
+
+So, to 'login' you need a Sharetribe user with an additional attribute in the privateData structure: attributes.profile.protectedData.admin == true. Do this in the console if using the Sharetribe server, or using your favourite mongoDB client if using FFS. Once you've done it for one user, you can use FFSAdmin (this) to enrol other users!
+
 ## Getting started with customization
 
 I've tried to keep the API use generic. The app doesn't depend on any custom data in our marketplace as the editor works on the raw JSON (public/protected/private/mete data structures). Still, you probably want to 'brand' the applcation (as I've done for OldenCars) and change some terms.
