@@ -26,7 +26,7 @@ const Header = ({ filterText, setFilterText, isAuth, logout }) => {
             {/* login/logout controls */}
             <ul className="navbar-nav ml-auto">
                 <li className="nav-item dropdown">
-                    <a className="nav-link" data-toggle="dropdown" onClick={e => {e.preventDefault(); logout(e);}} href="#">
+                    <a className="nav-link" data-toggle="dropdown" onClick={e => {e.preventDefault(); logout(e);}} href="!#">
                         { isAuth !== true 
                             ? <i className="fas fa-sign-in-alt" /> 
                             : <i className="fas fa-sign-out-alt"/>
