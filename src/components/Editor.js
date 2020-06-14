@@ -618,6 +618,7 @@ class Editor extends Component {
             editor: null,
             button: null,
             errors: 0,
+            updateRow: props.updateRow,
         }
 
         this.onSave = this.onSave.bind(this);
@@ -710,7 +711,7 @@ class Editor extends Component {
             case 'listing':
                 api = new listingApi();
                 api.updateListing(updates).then(res => {
-                    this.setState({ json: this.state.editor.get() })
+                    this.state.updateRow(this.state.editor.get())
                     alert("Update succeeded");
                 })
                 .catch(error => {
@@ -720,7 +721,7 @@ class Editor extends Component {
             case 'user':
                 api = new userApi();
                 api.updateUser(updates).then(res => {
-                    this.setState({ json: this.state.editor.get() })
+                    this.state.updateRow(this.state.editor.get())
                     alert("Update succeeded");
                 })
                 .catch(error => {
@@ -730,8 +731,6 @@ class Editor extends Component {
             default:
                 break;
         }
-
-        console.log(updates)
     }
 
     onValidationError = (errors) => {
@@ -775,7 +774,8 @@ class Editor extends Component {
         }
         
         // Json changed
-        if(nextState.json !== this.state.json) {
+        if(nextProps.data !== this.state.json) {
+            this.setState({json: nextProps.data})
             return true;
         }
 

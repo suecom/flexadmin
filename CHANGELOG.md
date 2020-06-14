@@ -8,6 +8,11 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v0.8.0]
+
+Changed font/padding
+Fixed entity updates (redux)
+
 ## [v0.7.0]
 
 Added logout and fixed login

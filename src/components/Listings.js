@@ -1,14 +1,16 @@
 import React, { useEffect, useMemo, useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
 
 import Editor from './Editor.js';
+import { loadListingsSuccess } from '../actions/listingActions.js'
 
 const Listings = ({ filterText, setFilterText }) => {
     const location = useLocation();
     const history = useHistory();
+    const dispatch = useDispatch()
     const users = useSelector(state => state.users);
     const listings = useSelector(state => state.listings);
     const transactions = useSelector(state => state.transactions);
@@ -18,10 +20,38 @@ const Listings = ({ filterText, setFilterText }) => {
     const customStyles = {
         headCells: {
             style: {
+                fontSize: '12px',
+                paddingLeft: '6px',
                 fontWeight: 'bold',
             },
-        }
+        },
+        expanderButton: {
+            style: {     
+                paddingRight: '0px',   
+                paddingLeft: '0px',     
+                svg: {
+                    paddingLeft: '0px',
+                    paddingRight: '0px',
+                    margin: '0px',
+                },
+            },
+        },
+        expanderCell: {
+            style: {
+                flex: '0 0 24px',
+                paddingRight: '0px',
+                paddingLeft: '2px',
+            },
+        },
+        cells: {
+            style: {
+                paddingLeft: '5px',
+                fontWeight: 'lighter',
+                
+            },
+        },
     };
+
 
     const clickReviews = useCallback((e) => {
         var searchStr = '';
@@ -189,6 +219,21 @@ const Listings = ({ filterText, setFilterText }) => {
         }
     }) 
 
+    const updateRow = useCallback((row) => {
+        var newListings = [];
+
+        listings.forEach(listing => {
+            if(listing.id.uuid === row.id.uuid) {
+                newListings.push(row)
+            }
+            else {
+                newListings.push(listing);
+            }
+        })
+
+        dispatch(loadListingsSuccess(newListings))
+    }, [ listings, dispatch ])
+
     const listingsPlus = useCallback(() => {
         listings.forEach(listing => {
             const u = users.filter(user => listing.relationships.author.data.id.uuid === user.id.uuid);
@@ -238,7 +283,7 @@ const Listings = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }      
                 expandableRows
-                expandableRowsComponent={<Editor validSchema={'listing'} />}   
+                expandableRowsComponent={<Editor validSchema={ 'listing' } updateRow={ updateRow } />}   
                 expandOnRowClicked      
             />
         </div>

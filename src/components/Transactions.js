@@ -20,10 +20,38 @@ const Transactions = ({ filterText, setFilterText }) => {
     const customStyles = {
         headCells: {
             style: {
+                fontSize: '12px',
+                paddingLeft: '6px',
                 fontWeight: 'bold',
             },
         },
-    }
+        expanderButton: {
+            style: {     
+                paddingRight: '0px',   
+                paddingLeft: '0px',     
+                svg: {
+                    paddingLeft: '0px',
+                    paddingRight: '0px',
+                    margin: '0px',
+                },
+            },
+        },
+        expanderCell: {
+            style: {
+                flex: '0 0 24px',
+                paddingRight: '0px',
+                paddingLeft: '2px',
+            },
+        },
+        cells: {
+            style: {
+                paddingLeft: '5px',
+                fontWeight: 'lighter',
+                
+            },
+        },
+    };
+
 
     const clickUser = useCallback((e) =>  {
         const user = users.filter(user => user.id.uuid === e.target.rel);

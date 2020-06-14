@@ -1,14 +1,16 @@
 import React, { useEffect, useMemo, useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useLocation } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import Mark from 'mark.js';
 
 import Editor from './Editor.js';
+import { loadUsersSuccess } from '../actions/userActions.js'
 
 const Users = ({ filterText, setFilterText }) => {
     const location = useLocation();
     const history = useHistory();
+    const dispatch = useDispatch()
     const users = useSelector(state => state.users);
     const listings = useSelector(state => state.listings);
     const transactions = useSelector(state => state.transactions);
@@ -17,10 +19,37 @@ const Users = ({ filterText, setFilterText }) => {
     const customStyles = {
         headCells: {
             style: {
+                fontSize: '12px',
+                paddingLeft: '6px',
                 fontWeight: 'bold',
             },
         },
-    }
+        expanderButton: {
+            style: {     
+                paddingRight: '0px',   
+                paddingLeft: '0px',     
+                svg: {
+                    paddingLeft: '0px',
+                    paddingRight: '0px',
+                    margin: '0px',
+                },
+            },
+        },
+        expanderCell: {
+            style: {
+                flex: '0 0 24px',
+                paddingRight: '0px',
+                paddingLeft: '2px',
+            },
+        },
+        cells: {
+            style: {
+                paddingLeft: '5px',
+                fontWeight: 'lighter',
+                
+            },
+        },
+    };
 
     const clickRented = useCallback((e) => {
         var searchStr = '';
@@ -85,10 +114,10 @@ const Users = ({ filterText, setFilterText }) => {
     const columns = useMemo(() => [
         {
             name: 'Enrolled',
-            format: row => new Date(row.attributes.createdAt).toLocaleDateString(),
+            format: row => typeof(row.attributes.createdAt) == 'string' ? row.attributes.createdAt : new Date(row.attributes.createdAt).toLocaleDateString(),
             selector: 'attributes.createdAt',
             sortable: true,
-            width: '95px',
+            width: '100px',
         }, 
         {
             name: 'Name',
@@ -177,8 +206,24 @@ const Users = ({ filterText, setFilterText }) => {
         }
     })
 
+    const updateRow = useCallback((row) => {
+        var newUsers = [];
+
+        users.forEach(user => {
+            if(user.id.uuid === row.id.uuid) {
+                newUsers.push(row)
+            }
+            else {
+                newUsers.push(user);
+            }
+        })
+
+        dispatch(loadUsersSuccess(newUsers))
+    }, [ users, dispatch ])
+
     const usersPlus = useCallback(() => {
         users.forEach(user => {
+            //user.keyField = user.id.uuid;
             user.listings = listings.filter(listing => listing.relationships.author.data.id.uuid === user.id.uuid).length;
             user.clients = transactions.filter(transaction => transaction.relationships.provider.data.id.uuid === user.id.uuid &&
                                                                 CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
@@ -209,7 +254,7 @@ const Users = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }
                 expandableRows
-                expandableRowsComponent={<Editor validSchema={'user'} />}  
+                expandableRowsComponent={<Editor validSchema={ 'user' } updateRow={ updateRow } />}  
                 expandOnRowClicked
             />
         </div>
