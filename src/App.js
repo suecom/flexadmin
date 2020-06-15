@@ -3,9 +3,9 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import configureStore from './store/configureStore';
-import { loadUsers } from './actions/userActions';
-import { loadListings } from './actions/listingActions';
-import { loadTransactions } from './actions/transactionActions';
+import { loadUsers, updateUsers } from './actions/userActions';
+import { loadListings, updateListings } from './actions/listingActions';
+import { loadTransactions, updateTransactions } from './actions/transactionActions';
 
 import Header from './components/Header';
 import SideBar from './components/SideBar';
@@ -17,10 +17,17 @@ import { marketplaceSdk } from './flexsdk.js'
 // Initialize and load store
 const store = configureStore();
 
-// Load it all
+// Load all entities
 store.dispatch(loadUsers());
 store.dispatch(loadListings());
 store.dispatch(loadTransactions());
+
+// eslint-disable-next-line
+const timerId = setInterval(() => {
+    store.dispatch(updateUsers());
+    store.dispatch(updateListings());
+    store.dispatch(updateTransactions());
+}, process.env.REACT_APP_REFRESH_INTERVAL * 1000)
 
 const App = (props) => {
   const [ filter, setFilterText ] = useState('');

@@ -251,33 +251,38 @@ const Listings = ({ filterText, setFilterText }) => {
     }, [ listings, dispatch ])
 
     const listingsPlus = useCallback(() => {
+        var dispList = [];
+
         listings.forEach(listing => {
-            const u = users.filter(user => listing.relationships.author.data.id.uuid === user.id.uuid);
+            var list = Object.assign({}, listing);
             
+            const u = users.filter(user => listing.relationships.author.data.id.uuid === user.id.uuid);
             if(u.length > 0) {
-                listing.owner = u[0].attributes.profile.firstName + ' ' + u[0].attributes.profile.lastName;
-                listing.ownerId = u[0].id.uuid;
-                listing.ownerEmail = u[0].attributes.email;
+                list.owner = u[0].attributes.profile.firstName + ' ' + u[0].attributes.profile.lastName;
+                list.ownerId = u[0].id.uuid;
+                list.ownerEmail = u[0].attributes.email;
             }
             
             const trans = transactions !== undefined ? transactions.filter(transaction => transaction.relationships.listing.data.id.uuid === listing.id.uuid) : [];
-            listing.enquires = trans.filter(t => EnquiryTransitions.includes(t.attributes.lastTransition)).length;
-            listing.rentals = trans.filter(t => CompletedTransitions.includes(t.attributes.lastTransition)).length;
-            listing.reviews = 0;
+            list.enquires = trans.filter(t => EnquiryTransitions.includes(t.attributes.lastTransition)).length;
+            list.rentals = trans.filter(t => CompletedTransitions.includes(t.attributes.lastTransition)).length;
+            list.reviews = 0;
             trans.forEach(t => {
                 if(t.relationships.reviews !== undefined && t.relationships.reviews.data !== undefined && t.relationships.reviews.data !== null) {
                     t.relationships.reviews.data.forEach(r => {
                         const rev = reviews.filter(r2 => r.id.uuid === r2.id.uuid);
 
                         if(rev.length > 0 && rev[0].relationships.subject.data.id.uuid === listing.relationships.author.data.id.uuid) {
-                            listing.reviews += 1;
+                            list.reviews += 1;
                         }
                     })
                 }
             })
+
+            dispList.push(list);
         })
 
-        return listings;
+        return dispList;
     }, [ users, listings, transactions, reviews, CompletedTransitions, EnquiryTransitions ])
 
     const data = useMemo(() => listingsPlus(), [ listingsPlus ]);

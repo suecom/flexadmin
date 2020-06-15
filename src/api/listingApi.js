@@ -14,7 +14,7 @@ class ListingApi {
         });
     }
 
-    getListings() {
+    getListings(maxPage = 0) {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
@@ -22,7 +22,7 @@ class ListingApi {
                 var promises = [], listings  = res.data.data, includes = res.data.included;
 
                 // Start any required requests
-                while(page < res.data.meta.totalPages) {
+                while(page < res.data.meta.totalPages && (maxPage === 0 || page < maxPage)) {
                     promises.push(this.getPage(++page));
                 }
 

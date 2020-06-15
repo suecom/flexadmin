@@ -152,7 +152,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             name: 'Status',
             selector: 'attributes.lastTransition',
             cell: row => {
-                return transitions.filter(tran => tran.tran == row.attributes.lastTransition)[0].lab
+                return transitions.filter(tran => tran.tran === row.attributes.lastTransition)[0].lab
             },
             sortable: true,
             width: '80px',
@@ -183,7 +183,7 @@ const Transactions = ({ filterText, setFilterText }) => {
             cell: row => <button className="btn btn-xs btn-block btn-success" onClick={clickReviews} value={row.id.uuid} disabled={row.reviews===0}>{row.reviews}</button>,
             ignoreRowClick: true,
         },
-    ], [ clickReviews, clickMessages, clickListing, clickUser ])
+    ], [ clickReviews, clickMessages, clickListing, clickUser, transitions ])
     
     const filterTransaction = (transaction) => {
         const terms = filterText.toLowerCase().split(',');
@@ -224,52 +224,56 @@ const Transactions = ({ filterText, setFilterText }) => {
     });
 
     const transactionsPlus = useCallback(() => {
+        var dispTrans = [];
+
         transactions.forEach(transaction => {
+            const nt = Object.assign({}, transaction);
+
             const p = users.filter(user => transaction.relationships.provider.data.id.uuid === user.id.uuid);
-
             if(p.length > 0) {
-                transaction.provider = p[0].attributes.profile.firstName + ' ' + p[0].attributes.profile.lastName;
-                transaction.providerId = p[0].id.uuid;
-                transaction.providerEmail = p[0].attributes.email;
+                nt.provider = p[0].attributes.profile.firstName + ' ' + p[0].attributes.profile.lastName;
+                nt.providerId = p[0].id.uuid;
+                nt.providerEmail = p[0].attributes.email;
             }
             else {
-                transaction.provider = '<deleted>';
-                transaction.providerId = '0';
-                transaction.providerEmail = '';
+                nt.provider = '<deleted>';
+                nt.providerId = '0';
+                nt.providerEmail = '';
             }
 
-            const c = users.filter(user => transaction.relationships.customer.data.id.uuid === user.id.uuid);
-            
+            const c = users.filter(user => transaction.relationships.customer.data.id.uuid === user.id.uuid);      
             if(c.length > 0) {
-                transaction.customer = c[0].attributes.profile.firstName + ' ' + c[0].attributes.profile.lastName;
-                transaction.customerId = c[0].id.uuid;
-                transaction.customerEmail = c[0].attributes.email;
+                nt.customer = c[0].attributes.profile.firstName + ' ' + c[0].attributes.profile.lastName;
+                nt.customerId = c[0].id.uuid;
+                nt.customerEmail = c[0].attributes.email;
             }
             else {
-                transaction.customer = '<deleted>';
-                transaction.customerId = '0';
-                transaction.customerEmail = '';
+                nt.customer = '<deleted>';
+                nt.customerId = '0';
+                nt.customerEmail = '';
             }
             
             const l = listings.filter(listing => transaction.relationships.listing.data.id.uuid === listing.id.uuid);
             if(l.length > 0) {
-                transaction.listingId = l[0].id.uuid;  
-                transaction.listing = l[0].attributes.title;
+                nt.listingId = l[0].id.uuid;  
+                nt.listing = l[0].attributes.title;
             }
             else {
-                transaction.listingId = '0';  
-                transaction.listing = '<deleted>';
+                nt.listingId = '0';  
+                nt.listing = '<deleted>';
             }
             
-            transaction.reviews = transaction.relationships.reviews.data.length;
-            transaction.messages = transaction.relationships.messages.data.length;
+            nt.reviews = transaction.relationships.reviews.data.length;
+            nt.messages = transaction.relationships.messages.data.length;
 
             if(transaction.attributes.payinTotal === null) {
-                transaction.attributes.payinTotal = { amount: 0, currency: 'GBP' };
+                nt.attributes.payinTotal = { amount: 0, currency: 'GBP' };
             }
+
+            dispTrans.push(nt);
         })
 
-        return transactions;
+        return dispTrans;
     }, [ transactions, listings, users ]);
 
     const data = useMemo(() => transactionsPlus(), [ transactionsPlus ])

@@ -8,6 +8,11 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v1.0.0]
+
+Added dynamic updating of entity state (refresh)
+Installed serviceWorker for offline access
+
 ## [v0.9.0]
 
 Fixed transition analysis in listing count

@@ -15,7 +15,14 @@ const Users = ({ filterText, setFilterText }) => {
     const listings = useSelector(state => state.listings);
     const transactions = useSelector(state => state.transactions);
     const reviews = useSelector(state => state.reviews);
-    const CompletedTransitions = ['transition/review-2-by-customer','transition/review-2-by-provider','transition/complete','transition/review-1-by-provider','transition/review-1-by-customer','transition/expire-customer-review-period','transition/expire-review-period'];
+    const CompletedTransitions = [
+        'transition/review-2-by-customer',
+        'transition/review-2-by-provider',
+        'transition/complete',
+        'transition/review-1-by-provider',
+        'transition/review-1-by-customer',
+        'transition/expire-customer-review-period',
+        'transition/expire-review-period'];
     const customStyles = {
         headCells: {
             style: {
@@ -222,17 +229,23 @@ const Users = ({ filterText, setFilterText }) => {
     }, [ users, dispatch ])
 
     const usersPlus = useCallback(() => {
+        var dispUsers = [];
+
         users.forEach(user => {
-            //user.keyField = user.id.uuid;
-            user.listings = listings.filter(listing => listing.relationships.author.data.id.uuid === user.id.uuid).length;
-            user.clients = transactions.filter(transaction => transaction.relationships.provider.data.id.uuid === user.id.uuid &&
-                                                                CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
-            user.rentals = transactions.filter(transaction => transaction.relationships.customer.data.id.uuid === user.id.uuid &&
-                                                                CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
-            user.reviews = reviews.filter(review => review.relationships.subject.data.id.uuid === user.id.uuid).length;
+            var u = Object.assign({}, user);
+            
+            //u.keyField = user.id.uuid;
+            u.listings = listings.filter(listing => listing.relationships.author.data.id.uuid === user.id.uuid).length;
+            u.clients = transactions.filter(transaction => transaction.relationships.provider.data.id.uuid === user.id.uuid &&
+                                        CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
+            u.rentals = transactions.filter(transaction => transaction.relationships.customer.data.id.uuid === user.id.uuid &&
+                                        CompletedTransitions.includes(transaction.attributes.lastTransition)).length;
+            u.reviews = reviews.filter(review => review.relationships.subject.data.id.uuid === user.id.uuid).length;
+
+            dispUsers.push(u)
         })
 
-        return users;
+        return dispUsers;
     }, [ users, listings, transactions, reviews, CompletedTransitions ])
 
     const data = useMemo(() => usersPlus(), [ usersPlus ])
