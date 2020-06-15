@@ -23,11 +23,13 @@ store.dispatch(loadListings());
 store.dispatch(loadTransactions());
 
 // eslint-disable-next-line
-const timerId = setInterval(() => {
-    store.dispatch(updateUsers());
-    store.dispatch(updateListings());
-    store.dispatch(updateTransactions());
-}, process.env.REACT_APP_REFRESH_INTERVAL * 1000)
+if(process.env.REACT_APP_REFRESH_INTERVAL > 0) {
+    const timerId = setInterval(() => {
+        store.dispatch(updateUsers());
+        store.dispatch(updateListings());
+        store.dispatch(updateTransactions());
+    }, process.env.REACT_APP_REFRESH_INTERVAL * 1000)
+}
 
 const App = (props) => {
   const [ filter, setFilterText ] = useState('');
