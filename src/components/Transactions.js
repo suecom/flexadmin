@@ -17,6 +17,23 @@ const Transactions = ({ filterText, setFilterText }) => {
     const transactions = useSelector(state => state.transactions);
     const users = useSelector(state => state.users);
     const listings = useSelector(state => state.listings); 
+    const transitions = [
+        { tran: 'transition/review-2-by-customer', lab: 'Complete' },
+        { tran: 'transition/review-2-by-provider', lab: 'Complete' },
+        { tran: 'transition/complete', lab: 'Complete' },
+        { tran: 'transition/review-1-by-provider', lab: 'Complete' },
+        { tran: 'transition/review-1-by-customer', lab: 'Complete' },
+        { tran: 'transition/expire-customer-review-period', lab: 'Complete' },
+        { tran: 'transition/expire-review-period', lab: 'Complete' },
+        { tran: 'transition/enquire', lab: 'Enquire' },
+        { tran: 'transition/request-payment', lab: 'Enquire' },
+        { tran: 'transition/request-payment-after-enquiry', lab: 'Enquire' },
+        { tran: 'transition/confirm-payment', lab: 'Enquire' },
+        { tran: 'transition/accept', lab: 'Pending' },
+        { tran: 'transition/cancel', lab: 'Decline' },
+        { tran: 'transition/expire-payment', lab: 'Decline' },
+        { tran: 'transition/decline', lab: 'Decline' },
+        { tran: 'transition/expire', lab: 'Decline' } ];
     const customStyles = {
         headCells: {
             style: {
@@ -51,7 +68,6 @@ const Transactions = ({ filterText, setFilterText }) => {
             },
         },
     };
-
 
     const clickUser = useCallback((e) =>  {
         const user = users.filter(user => user.id.uuid === e.target.rel);
@@ -133,12 +149,21 @@ const Transactions = ({ filterText, setFilterText }) => {
             compact: true,
         },
         {
+            name: 'Status',
+            selector: 'attributes.lastTransition',
+            cell: row => {
+                return transitions.filter(tran => tran.tran == row.attributes.lastTransition)[0].lab
+            },
+            sortable: true,
+            width: '80px',
+        },
+        {
             name: 'Value',
             selector: 'attributes.payinTotal.amount',
             format: row => formatter.format(row.attributes.payinTotal.amount/100),
             sortable: true,
             right: true,
-            width: '120px',
+            width: '90px',
         }, 
         {
             name: 'Messages',

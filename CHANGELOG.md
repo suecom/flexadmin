@@ -8,9 +8,14 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v0.9.0]
+
+Fixed transition analysis in listing count
+Add transaction status to transactions listing
+
 ## [v0.8.0]
 
-Changed font/padding
+Changed font/padding/UI tweaks
 Fixed entity updates (redux)
 
 ## [v0.7.0]

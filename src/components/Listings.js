@@ -15,8 +15,24 @@ const Listings = ({ filterText, setFilterText }) => {
     const listings = useSelector(state => state.listings);
     const transactions = useSelector(state => state.transactions);
     const reviews = useSelector(state => state.reviews);
-    const CompletedTransitions = ['transition/review-2-by-customer','transition/review-2-by-provider','transition/complete','transition/review-1-by-provider','transition/review-1-by-customer','transition/expire-customer-review-period','transition/expire-review-period'];
-    const EnquiryTransitions = ['transition/request-payment','transition/request-payment-after-enquiry','transition/expire-payment','transition/decline','transition/expire'];
+    const CompletedTransitions = [
+        'transition/review-2-by-customer',
+        'transition/review-2-by-provider',
+        'transition/complete',
+        'transition/review-1-by-provider',
+        'transition/review-1-by-customer',
+        'transition/expire-customer-review-period',
+        'transition/expire-review-period'];
+    const EnquiryTransitions = [
+        'transition/enquire',
+        'transition/request-payment',
+        'transition/request-payment-after-enquiry',
+        'transition/confirm-payment',
+        'transition/expire-payment',
+        'transition/decline',
+        'transition/expire',
+        'transition/cancel',
+        'transition/accept'];
     const customStyles = {
         headCells: {
             style: {
