@@ -19,7 +19,7 @@ const Login = ({ authSubmit, authMessage, location, history }) =>  {
                     <p className={authMessage.style}>{ authMessage.text }</p>
                     <form onSubmit={handleSubmit}>
                         <div className="input-group mb-3">
-                            <input type="email" className="form-control" placeholder="Email" onChange={e => setEmail(e.target.value)} />
+                            <input type="email" className="form-control" placeholder="Email" autoComplete="username" onChange={e => setEmail(e.target.value)} />
                             <div className="input-group-append">
                                 <div className="input-group-text">
                                     <span className="fas fa-envelope" />

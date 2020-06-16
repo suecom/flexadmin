@@ -60,7 +60,6 @@ const App = (props) => {
                   setAuthMessage({ style: 'login-box-error-msg', text: 'Try again...'})
               });
           } 
-          console.log(loginRes);
       })
       .catch((e) => {
           setAuthMessage({ style: 'login-box-error-msg', text: 'Try again...'})
