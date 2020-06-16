@@ -2,22 +2,15 @@
 
 This project is not endorsed, supported, or approved by Sharetribe. All design, code, bugs, problems are not in anyway Sharetribe's. Sharetribe is in no way responsible for this project, nor the maintenance and support of it. 
 
-This is a Flex Integration SDK application. A little more ambitious than the Sharetribe SDK examples, it relies on the same backend API. This is an alternate admin console. 
-
-The motivation is to allow the use of the FFS backend in production. In effect, this is the FFS console app. Hopefully you'll prefer it to the Sharetribe console, and can use it instead of, or as well as?
+This is a Flex Integration SDK application. A little more ambitious than the Sharetribe SDK examples, it relies entirely on the Flex Integration SDK. This is an alternate admin console, but obviously can't do all the things the console can (generate API keys, etc). 
 
 Styling is taken from CoreUIs AdminLTE template, and I apologise in advance for my lack of UI design skills. Maybe you could improve it?
-
-NOTE: Some of the schema editing will NOT work when using the Sharetribe server
-(listing's state/deleted for example), as these resources are not in the original 'update' API. They should use the open/close/approve APIs - TODO
 
 ## Quick start (no such thing!)
 
 You will need:
 
-If you are using Sharetribe's backend (as oppose to FFS), you will need both the REACT_APP_FLEX_INTEGRATION_CLIENT_ID and REACT_APP_FLEX_INTEGRATION_CLIENT_SECRET keys in .env.*. In FFS these are ignored (make them up).
-
-If you're using FFS, you need to set REACT_APP_FLEX_INTEGRATION_BASE_URL to your FFS server's address (else it will defuault to Sharetribe's)
+By using Sharetribe's backend, you will need both the REACT_APP_FLEX_INTEGRATION_CLIENT_ID and REACT_APP_FLEX_INTEGRATION_CLIENT_SECRET keys in .env.*. You will also need your corresponding REACT_APP_SHARETRIBE_SDK_CLIENT_ID to login (the marketplace Flex SDK is uded for authorization)
 
 We used create-react-app to bootstrap this app, so 'npm run start' is all you need to kick it off locally (at localhost:3000). If you want to deploy the build to heroku, do the following (in your local repository folder):
 
@@ -40,7 +33,7 @@ You now have to set the REACT_APP_ environment variables for the app (see above)
 
 To login we use the Marketplace authentication API. YES, we're using BOTH SDKs in the same project! The reason for this is I didnt want to involve another auth server when we already have one! As the Integration API is hard-coded to the cleint IDs, this provides no protection when exposed externally (on the Internet). 
 
-So, to 'login' you need a Sharetribe user with an additional attribute in the privateData structure: attributes.profile.protectedData.admin == true. Do this in the console if using the Sharetribe server, or using your favourite mongoDB client if using FFS. Once you've done it for one user, you can use FFSAdmin (this) to enrol other users!
+So, to 'login' you need a Sharetribe user with an additional attribute in the privateData structure: attributes.profile.protectedData.admin == true (boolean, not string). Do this in the console. Once you've done it for one user, you can use Flex Admin (this) to enrol other users!
 
 ## Getting started with customization
 

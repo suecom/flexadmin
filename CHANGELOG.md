@@ -8,6 +8,10 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v1.1.0]
+
+Added UUID linking from jsoneditor
+
 ## [v1.0.0]
 
 Added dynamic updating of entity state (refresh)
@@ -51,4 +55,4 @@ Added users and listing to the framework (via redux)
 
 Provides the basic structure of the react web-app. It is created with create-react-app, and tries to follow the standard pattern in as much as I understand it, and it exists today (constantly changing!). CoreUI's admin template provides the underlying CSS.
 
-- Starting a change log for FFS Admin
+- Starting a change log for Flex Admin

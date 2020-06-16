@@ -50,7 +50,7 @@ const Login = ({ authSubmit, authMessage, location, history }) =>  {
                         <br/>
                         <p>- YOU MUST -</p>         
                         <a href="/login" className="btn btn-block ">
-                            <img src="sharetribe.png" alt='Sharetribe'/> Sign in using Sharetribe/FFS
+                            <img src="sharetribe.png" alt='Sharetribe'/> Sign in using Sharetribe
                         </a>
                     </div>
                 </div>
