@@ -165,6 +165,14 @@ const Reviews = ({ filterText, setFilterText }) => {
         }
     })
 
+    const linkUUID = useCallback((entity, id) => {
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/' + entity + '?search=' + id.substr(id.lastIndexOf('-')+1,));
+    }, [ filterText, history, location.pathname ])
+
     const reviewsPlus = useCallback(() => {
         reviews.forEach(review => {
             const a = users.filter(user => review.relationships.author.data.id.uuid === user.id.uuid);
@@ -213,7 +221,7 @@ const Reviews = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false } 
                 expandableRows
-                expandableRowsComponent={<Editor validSchema={'review'} />}  
+                expandableRowsComponent={<Editor validSchema={'review'} linkUUID={ linkUUID } />}  
                 expandOnRowClicked        
             />
         </div>

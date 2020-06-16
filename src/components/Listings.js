@@ -235,6 +235,14 @@ const Listings = ({ filterText, setFilterText }) => {
         }
     }) 
 
+    const linkUUID = useCallback((entity, id) => {
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/' + entity + '?search=' + id.substr(id.lastIndexOf('-')+1,));
+    }, [ filterText, history, location.pathname ])
+
     const updateRow = useCallback((row) => {
         var newListings = [];
 
@@ -304,7 +312,7 @@ const Listings = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }      
                 expandableRows
-                expandableRowsComponent={<Editor validSchema={ 'listing' } updateRow={ updateRow } />}   
+                expandableRowsComponent={<Editor validSchema={ 'listing' } updateRow={ updateRow } linkUUID={ linkUUID } />}   
                 expandOnRowClicked      
             />
         </div>

@@ -146,6 +146,14 @@ const Messages = ({ filterText, setFilterText }) => {
         }
     })
 
+    const linkUUID = useCallback((entity, id) => {
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/' + entity + '?search=' + id.substr(id.lastIndexOf('-')+1,));
+    }, [ filterText, history, location.pathname ])
+
     const messagesPlus = useCallback(() => {
         messages.forEach(message => {
             const a = users.filter(user => message.relationships.sender.data.id.uuid === user.id.uuid);
@@ -225,7 +233,7 @@ const Messages = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }    
                 expandableRows
-                expandableRowsComponent={<Editor validSchema={'message'} />}  
+                expandableRowsComponent={<Editor validSchema={'message'} linkUUID={ linkUUID } />}  
                 expandOnRowClicked       
             />
         </div>

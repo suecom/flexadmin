@@ -619,11 +619,13 @@ class Editor extends Component {
             button: null,
             errors: 0,
             updateRow: props.updateRow,
+            linkUUID: props.linkUUID,
         }
 
         this.onSave = this.onSave.bind(this);
         this.onValidationError = this.onValidationError.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.onEvent = this.onEvent.bind(this);
     };
     
     onEditable = (node) => {
@@ -767,6 +769,29 @@ class Editor extends Component {
         }
     }
 
+    onEvent = ({field, path, value}, event) => {
+        if(field === 'uuid' && value !== undefined && event.buttons === 1) {
+            const entities = [ 
+                { path: 'author', entity: 'users' },
+                { path: 'provider', entity: 'users' },
+                { path: 'customer', entity: 'users' },
+                { path: 'subject', entity: 'users' },
+                { path: 'sender', entity: 'users' },
+                { path: 'images', entity: 'images' }, 
+                { path: 'profileImage', entity: 'images' },
+                { path: 'listing', entity: 'listings' },
+                { path: 'reviews', entity: 'reviews'},
+                { path: 'messages', entity: 'messages' },
+
+            ];
+            const paths = entities.filter(e => path.indexOf(e.path) !== -1)
+            
+            if(paths.length !== 0 && (typeof this.state.linkUUID) === 'function') {
+                this.state.linkUUID(paths[0].entity, value)
+            }
+        }        
+    }
+
     shouldComponentUpdate(nextProps, nextState) {
         // Editor not instantiated
         if(nextState.container !== null && nextState.editor === null) {
@@ -800,6 +825,9 @@ class Editor extends Component {
                 onEditable: this.onEditable,
                 onChange: this.onChange,
                 onValidationError: this.onValidationError,
+                onEvent: this.onEvent,
+                timestampTag: this.timestampTag,
+                timestampFormat: this.timestampFormat,
                 name: this.state.schema,
                 history: true,
                 navigationBar: false,

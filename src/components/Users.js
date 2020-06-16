@@ -185,7 +185,8 @@ const Users = ({ filterText, setFilterText }) => {
         for(var i = 0; i < terms.length && terms[i].length > 0 && retVal === false; i++) {
             retVal = user.attributes.email.toLowerCase().search(terms[i]) !== -1 ||
                 user.attributes.profile.firstName.toLowerCase().search(terms[i]) !== -1 ||
-                user.attributes.profile.lastName.toLowerCase().search(terms[i]) !== -1 
+                user.attributes.profile.lastName.toLowerCase().search(terms[i]) !== -1 ||
+                user.id.uuid.toLowerCase().search(terms[i]) !== -1
         }
 
         return retVal;
@@ -212,6 +213,14 @@ const Users = ({ filterText, setFilterText }) => {
             });
         }
     })
+
+    const linkUUID = useCallback((entity, id) => {
+        // This set the state for this location
+        history.replace(location.pathname, { filterText: filterText });
+
+        // This then redirects using the query to update filterText
+        history.push('/' + entity + '?search=' + id.substr(id.lastIndexOf('-')+1,));
+    }, [ filterText, history, location.pathname ])
 
     const updateRow = useCallback((row) => {
         var newUsers = [];
@@ -267,7 +276,7 @@ const Users = ({ filterText, setFilterText }) => {
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }
                 expandableRows
-                expandableRowsComponent={<Editor validSchema={ 'user' } updateRow={ updateRow } />}  
+                expandableRowsComponent={<Editor validSchema={ 'user' } updateRow={ updateRow } linkUUID={ linkUUID } />}  
                 expandOnRowClicked
             />
         </div>
