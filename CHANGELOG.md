@@ -8,6 +8,12 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v1.2.0]
+
+Fixed image linking
+editor UUID linking
+open/save/approve listing updates
+
 ## [v1.1.0]
 
 Added UUID linking from jsoneditor
