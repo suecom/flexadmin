@@ -712,9 +712,40 @@ class Editor extends Component {
         switch(type) {
             case 'listing':
                 api = new listingApi();
-                api.updateListing(updates).then(res => {
-                    this.state.updateRow(this.state.editor.get())
-                    alert("Update succeeded");
+                var prom = null;
+
+                if(updates['state'] !== undefined) {
+                    switch(updates['state']) {
+                        case 'published':
+                            if(o1.state === 'PendingApproval') {
+                                prom = api.approveListing(updates['id']);
+                            }
+                            else {
+                                // Was closed
+                                prom = api.openListing(updates['id']);
+                            }
+                            break;
+                        case 'closed':
+                        case 'draft':
+                        case 'pendingApproval':
+                            prom = api.closeListing(updates['id']);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else {
+                    prom = api.updateListing(updates)
+                }
+
+                prom.then(res => {
+                    if(res.status === 200) {
+                        this.state.updateRow(this.state.editor.get())
+                        alert("Update succeeded");
+                    }
+                    else {
+                        alert(res.message);
+                    }
                 })
                 .catch(error => {
                     alert("update FAILED");

@@ -53,6 +53,33 @@ class ListingApi {
             return error;
         });
     }
+
+    openListing(id) {
+        return integrationSdk.listings.open({id: id})
+        .then(response => {
+            return response;
+        }).catch(error => {
+            return error;
+        });
+    }
+
+    closeListing(id) {
+        return integrationSdk.listings.close({id: id})
+        .then(response => {
+            return response;
+        }).catch(error => {
+            return error;
+        });
+    }
+
+    approveListing(id) {
+        return integrationSdk.listings.approve({id: id})
+        .then(response => {
+            return response;
+        }).catch(error => {
+            return error;
+        });
+    }
 }
 
 export default ListingApi;
