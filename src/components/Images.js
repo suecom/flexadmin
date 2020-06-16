@@ -67,7 +67,9 @@ const Images = ({ filterText, setFilterText }) => {
         },   
         {
             name: 'Image',
-            cell: row => { return (<img className='img-size-50 mr-3 img-circle' alt='help' src={ row.url } />) },
+            cell: row => { 
+                const c = row.origin === 'User' ? 'img-size-50 mr-3 img-circle' : 'img-size-50 mr-3'
+                return (<a href={ row.url } target='_blank' rel='noopener noreferrer'><img className={ c } alt='help' src={ row.url } /></a>) },
         },  
     ], [ clickUser, clickListing ])
 
