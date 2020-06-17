@@ -120,7 +120,8 @@ const Images = ({ filterText, setFilterText }) => {
             }
             else {
                 listings.forEach(listing => {
-                    const list = listing.relationships.images.data.filter(i => i.id.uuid === image.id.uuid);
+                    const list = (listing.relationships.images !== undefined  && listing.relationships.images.data !== undefined) 
+                                    ? listing.relationships.images.data.filter(i => i.id.uuid === image.id.uuid) : [];
 
                     if(list.length > 0) {
                         image.user = listing.attributes.title;
