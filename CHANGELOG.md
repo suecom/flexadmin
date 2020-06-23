@@ -12,6 +12,7 @@
 
 Changed manual navigation by clearing likely unwanted filterText
 Schama fix
+Some return values checked!
 
 
 ## [v1.2.0]

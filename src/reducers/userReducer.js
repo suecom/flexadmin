@@ -11,22 +11,24 @@ const newerThan = (n, o) => {
 const mergeUsers = (now, added) => {
     var newUsers = [];
 
-    added.forEach(user => {
-        const exist = now.filter(u => u.id.uuid === user.id.uuid);
+    if(added != null) {
+        added.forEach(user => {
+            const exist = now.filter(u => u.id.uuid === user.id.uuid);
 
-        if(exist.length === 0) {
-            newUsers.push(user)
-        }
-        else {
-            if (newerThan(user, exist[0])) {
-                // Remove existing item
-                now = now.filter(u => u.id.uuid !== user.id.uuid)
-
-                // And add updated one to new list
-                newUsers.push(user);
+            if(exist.length === 0) {
+                newUsers.push(user)
             }
-        }
-    })
+            else {
+                if (newerThan(user, exist[0])) {
+                    // Remove existing item
+                    now = now.filter(u => u.id.uuid !== user.id.uuid)
+
+                    // And add updated one to new list
+                    newUsers.push(user);
+                }
+            }
+        })
+    }
 
     return newUsers.length === 0 ? now : newUsers.concat(now)
 }

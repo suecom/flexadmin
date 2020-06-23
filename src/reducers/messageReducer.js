@@ -4,13 +4,15 @@ import initialState from './initialState';
 const mergeMessages = (now, added) => {
     var newMes = [];
 
-    added.forEach(mes => {
-        const exist = now.filter(m => m.id.uuid === mes.id.uuid);
+    if(added != null) {
+        added.forEach(mes => {
+            const exist = now.filter(m => m.id.uuid === mes.id.uuid);
 
-        if(exist.length === 0) {
-            newMes.push(mes)
-        }
-    })
+            if(exist.length === 0) {
+                newMes.push(mes)
+            }
+        })
+    }
 
     return newMes.length === 0 ? now : newMes.concat(now)
 }

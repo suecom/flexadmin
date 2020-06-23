@@ -4,13 +4,15 @@ import initialState from './initialState';
 const mergeReviews = (now, added) => {
     var newRev = [];
 
-    added.forEach(rev => {
-        const exist = now.filter(r => r.id.uuid === rev.id.uuid);
+    if(added != null) {
+        added.forEach(rev => {
+            const exist = now.filter(r => r.id.uuid === rev.id.uuid);
 
-        if(exist.length === 0) {
-            newRev.push(rev)
-        }
-    })
+            if(exist.length === 0) {
+                newRev.push(rev)
+            }
+        })
+    }
 
     return newRev.length === 0 ? now : newRev.concat(now)
 }

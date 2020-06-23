@@ -4,13 +4,15 @@ import initialState from './initialState';
 const mergeImages = (now, added) => {
     var newImages = [];
 
-    added.forEach(image => {
-        const exist = now.filter(i => i.id.uuid === image.id.uuid);
+    if(added != null) {
+        added.forEach(image => {
+            const exist = now.filter(i => i.id.uuid === image.id.uuid);
 
-        if(exist.length === 0) {
-            newImages.push(image)
-        }
-    })
+            if(exist.length === 0) {
+                newImages.push(image)
+            }
+        })
+    }
 
     return newImages === 0 ? now : newImages.concat(now)
 }
