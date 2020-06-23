@@ -18,7 +18,7 @@ class ListingApi {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
-            if(res !== null && res.data !== undefined) {
+            if(res.status === 200 && res !== null && res.data !== undefined) {
                 var promises = [], listings  = res.data.data, includes = res.data.included;
 
                 // Start any required requests
@@ -37,9 +37,14 @@ class ListingApi {
 
                 return { listings, images };
             }
-            else {
+            else if(res.status === 401) {
                 var l = [], images = [];
 
+                alert('Looks like your REACT_APP_FLEX_INTEGRATION_CLIENT_ID or REACT_APP_FLEX_INTEGRATION_CLIENT_SECRET is invalid');
+
+                return { listings: l, images }
+            }
+            else {
                 return { listings: l, images }
             }
         })

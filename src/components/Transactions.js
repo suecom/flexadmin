@@ -308,7 +308,7 @@ const Transactions = ({ filterText, setFilterText }) => {
                 pointerOnHover
                 customStyles = { customStyles }
                 fixedHeader
-                fixedHeaderScrollHeight = '85vh'
+                fixedHeaderScrollHeight = '90vh'
                 noHeader
                 defaultSortField = 'attributes.createdAt' 
                 defaultSortAsc = { false }  

@@ -16,7 +16,7 @@ class TransactionApi {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
-            if(res !== null && res.data !== undefined) {
+            if(res.status === 200 && res !== null && res.data !== undefined) {
                 var promises = [], transactions  = res.data.data, includes = res.data.included;
 
                 // Start any required requests
@@ -49,9 +49,14 @@ class TransactionApi {
 
                 return { transactions, reviews, messages };
             }
-            else {
+            else if(res.status === 401) {
                 var t = [], reviews = [], messages = [];
+                
+                alert('Looks like your REACT_APP_FLEX_INTEGRATION_CLIENT_ID or REACT_APP_FLEX_INTEGRATION_CLIENT_SECRET is invalid');
 
+                return { transactions: t, reviews, messages }
+            }
+            else {
                 return { transactions: t, reviews, messages }
             }
         })

@@ -8,6 +8,12 @@
 
 ## Upcoming version 2020-XX-XX
 
+## [v1.3.0]
+
+Changed manual navigation by clearing likely unwanted filterText
+Schama fix
+
+
 ## [v1.2.0]
 
 Fixed image linking

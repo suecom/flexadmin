@@ -16,7 +16,7 @@ class UserApi {
         var page = 1;
 
         return this.getPage(page).then(async (res) => {
-            if(res !== null && res.data !== undefined) {
+            if(res.status === 200 && res !== null && res.data !== undefined) {
                 var promises = [], users  = res.data.data, includes = res.data.included;;
 
                 // Start any required requests
@@ -35,9 +35,14 @@ class UserApi {
 
                 return { users, images };
             }
-            else {
+            else if(res.status === 401) {
                 var u = [], images = [];
+                
+                alert('Looks like your REACT_APP_FLEX_INTEGRATION_CLIENT_ID or REACT_APP_FLEX_INTEGRATION_CLIENT_SECRET is invalid');
 
+                return { users: u, images }
+            }
+            else {
                 return { users: u, images }
             }
         })
