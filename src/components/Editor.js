@@ -360,7 +360,7 @@ const transaction = {
                 'lastTransition': { 'type': 'string' },
                 'lastTransitionedAt': { 'type': 'string' },
                 'payinTotal': {
-                    'type': 'object',
+                    'type': [ 'object', 'null' ],
                     'readOnly': true,
                     'properties': {
                         '_sdkType': { 'type': 'string', 'const': 'Money' },
@@ -370,7 +370,7 @@ const transaction = {
                     'additionalProperties': false, 
                 },
                 'payoutTotal': {
-                    'type': 'object',
+                    'type': [ 'object', 'null' ],
                     'readOnly': true,
                     'properties': {
                         '_sdkType': { 'type': 'string', 'const': 'Money' },

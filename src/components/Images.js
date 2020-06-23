@@ -89,6 +89,15 @@ const Images = ({ filterText, setFilterText }) => {
     useEffect(() => {
         var instance = new Mark("div.animated");
 
+        for(const term of filterText.split(',')) {
+            instance.mark(term, { 
+                'element': 'span', 
+                'className': 'markGreen',              
+            });
+        }
+    }, [filterText])
+
+    useEffect(() => {
         // Update the search filter according to router
         if(location.search.indexOf('search') !== -1) {
             setFilterText(location.search.substr(location.search.indexOf('=')+1));
@@ -99,14 +108,15 @@ const Images = ({ filterText, setFilterText }) => {
             setFilterText(location.state.filterText);
             location.state = null;
         } 
-
-        for(const term of filterText.split(',')) {
-            instance.mark(term, { 
-                'element': 'span', 
-                'className': 'markGreen',              
-            });
+        else {
+            // Called when navigating manually (not via link)
+            // If no documents selected with current filterText then clear
+            if(filterText.length > 0 && data.filter(image => filterImage(image)).length === 0) {
+                setFilterText('')
+            }
         }
-    })
+    // eslint-disable-next-line
+    }, [ location.search, location.state, setFilterText, filterImage ])
 
     const imagesPlus = useCallback(() => {
         images.forEach(image => {

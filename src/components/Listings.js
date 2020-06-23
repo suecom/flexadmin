@@ -216,6 +216,15 @@ const Listings = ({ filterText, setFilterText }) => {
     useEffect(() => {
         var instance = new Mark("div.animated");
 
+        for(const term of filterText.split(',')) {
+            instance.mark(term, { 
+                'element': 'span', 
+                'className': 'markGreen',              
+            });
+        }
+    }, [filterText])
+
+    useEffect(() => {
         // Update the search filter according to router
         if(location.search.indexOf('search') !== -1) {
             setFilterText(location.search.substr(location.search.indexOf('=')+1));
@@ -226,14 +235,15 @@ const Listings = ({ filterText, setFilterText }) => {
             setFilterText(location.state.filterText);
             location.state = null;
         } 
-
-        for(const term of filterText.split(',')) {
-            instance.mark(term, { 
-                'element': 'span', 
-                'className': 'markGreen',              
-            });
+        else {
+            // Called when navigating manually (not via link)
+            // If no documents selected with current filterText then clear
+            if(filterText.length > 0 && data.filter(listing => filterListing(listing)).length === 0) {
+                setFilterText('')
+            }
         }
-    }) 
+    // eslint-disable-next-line
+    }, [ location.search, location.state, setFilterText, filterListing ])
 
     const linkUUID = useCallback((entity, id) => {
         // This set the state for this location
