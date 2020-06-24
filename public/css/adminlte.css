@@ -111,6 +111,13 @@ address {
   line-height: inherit;
 }
 
+.version {
+  color: green;
+  font-size: 0.8rem;
+  position: absolute;
+  bottom: 0;
+}
+
 ol,
 ul,
 dl {

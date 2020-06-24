@@ -8,7 +8,7 @@ This project is not endorsed, supported, or approved by Sharetribe. All design, 
 
 This is a Flex Integration SDK application, that also uses the Marketplace SDK for authentication (only). The application is a little more ambitious than the Integration SDK examples, but relies entirely on the same (no native calls to the API endpoints). 
 
-Styling is taken from CoreUIs AdminLTE template, and I apologise in advance for my lack of UI design skills. Maybe you could improve it?
+Styling is taken from CoreUIs AdminLTE template (https://github.com/ColorlibHQ/AdminLTE/releases/tag/v3.0.5), and I apologise in advance for my lack of UI design skills. Maybe you could improve it?
 
 ## Quick start
 

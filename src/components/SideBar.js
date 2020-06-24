@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { NavLink } from "react-router-dom";
 
 import BrandLink from './BrandLink';
+import packageJson from '../../package.json';
 
 const SideBar = ({ routes }) =>  {
     const transactions = useSelector(state => state.transactions);
@@ -11,7 +12,7 @@ const SideBar = ({ routes }) =>  {
     const reviews = useSelector(state => state.reviews);
     const messages = useSelector(state => state.messages);
     const images = useSelector(state => state.images);
-
+console.log(packageJson.version)
     const makeLabel = useCallback((route) => {
         var cnt = 0;
 
@@ -58,8 +59,11 @@ const SideBar = ({ routes }) =>  {
                         ))}
                     </ul>
                 </nav>
+                <div className="version d-none d-sm-inline-block">
+                    <b>v </b>{packageJson.version}
+                </div>
             </div>
-            {/* /.sidebar */}
+            {/* /.sidebar */}   
         </aside>
     )
 }
