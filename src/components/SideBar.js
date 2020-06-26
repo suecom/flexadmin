@@ -12,7 +12,7 @@ const SideBar = ({ routes }) =>  {
     const reviews = useSelector(state => state.reviews);
     const messages = useSelector(state => state.messages);
     const images = useSelector(state => state.images);
-console.log(packageJson.version)
+
     const makeLabel = useCallback((route) => {
         var cnt = 0;
 

@@ -74,11 +74,15 @@ const App = (props) => {
     }
 
     if(!isAuth) {
-        marketplaceSdk.currentUser.show().then(res => {
-            if(res != null &&
-                    res.data.data.attributes.profile.protectedData.admin !== undefined &&
-                    res.data.data.attributes.profile.protectedData.admin === true) {
-                setAuth(true);
+        marketplaceSdk.authInfo().then(authInfo => {
+            if(authInfo !== null && authInfo.isAnonymous === false) {
+                marketplaceSdk.currentUser.show().then(res => {
+                    if(res != null &&
+                            res.data.data.attributes.profile.protectedData.admin !== undefined &&
+                            res.data.data.attributes.profile.protectedData.admin === true) {
+                        setAuth(true);
+                    }
+                })
             }
         })
         .catch(err => {
