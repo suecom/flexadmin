@@ -77,7 +77,10 @@ const App = (props) => {
         marketplaceSdk.authInfo().then(authInfo => {
             if(authInfo !== null && authInfo.isAnonymous === false) {
                 marketplaceSdk.currentUser.show().then(res => {
-                    if(res != null &&
+                    if(res !== null && 
+                            res.data !== undefined && res.data !== null && 
+                            res.data.data !== undefined && res.data.data !== null && 
+                            res.data.data.attributes !== undefined && res.data.data.attribute !== null &&
                             res.data.data.attributes.profile.protectedData.admin !== undefined &&
                             res.data.data.attributes.profile.protectedData.admin === true) {
                         setAuth(true);
