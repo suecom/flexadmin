@@ -10,6 +10,8 @@ This is a Flex Integration SDK application, that also uses the Marketplace SDK f
 
 Styling is taken from CoreUIs AdminLTE template (https://github.com/ColorlibHQ/AdminLTE/releases/tag/v3.0.5), and I apologise in advance for my lack of UI design skills. Maybe you could improve it?
 
+BEWARE: Any app using the Flex Integration API has to contain the client secret, so unless this app is broken in two (backend/UI), this is a necassary compromise. As such the web app exposes the Flex Integration API secret! I suggest you don't expose the app outside your organization. 
+
 ## Quick start
 
 You will need:
