@@ -18,8 +18,8 @@
     "react-sizeme": "^2.6.12",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "sharetribe-flex-integration-sdk": "^1.1.0",
-    "sharetribe-flex-sdk": "^1.11.0",
+    "sharetribe-flex-integration-sdk": "^1.11.0",
+    "sharetribe-flex-sdk": "^1.21.1",
     "styled-components": "^5.1.1"
   },
   "scripts": {
